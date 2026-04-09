@@ -4,7 +4,13 @@
 
 O objetivo do trabalho prático é desenvolver um compilador para uma mini linguagem didática. O trabalho está dividido em 3 etapas, conforme a descrição a seguir.
 
-## Lexical Analyzer
+## Autores
+
+- [Otavio Sbampato Andrade](https://github.com/otaviosbampato)
+- [Gabriel Coelho Costa](https://github.com/gabrielzinCoelho)
+- [Heitor Ramos Vieira Rocha](https://github.com/heitor-vieira)
+
+## Analisador Léxico
 
 - Implemente um analisador léxico em Flex para a linguagem com os seguintes elementos:
   - Declarações de tipos (int, float);
