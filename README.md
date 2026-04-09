@@ -10,9 +10,9 @@ O objetivo do trabalho prático é desenvolver um compilador para uma mini lingu
 - [Gabriel Coelho Costa](https://github.com/gabrielzinCoelho)
 - [Heitor Ramos Vieira Rocha](https://github.com/heitor-vieira)
 
-### Requisitos Funcionais
+## Requisitos Funcionais
 
-## Analisador Léxico
+### Analisador Léxico
 
 - Implemente um analisador léxico em Flex para a linguagem com os seguintes elementos:
   - Declarações de tipos (int, float);
