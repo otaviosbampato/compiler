@@ -4,12 +4,6 @@
 
 O objetivo do trabalho prático é desenvolver um compilador para uma mini linguagem didática. O trabalho está dividido em 3 etapas, conforme a descrição a seguir.
 
-## Autores
-
-- [Otavio Sbampato Andrade](https://github.com/otaviosbampato)
-- [Gabriel Coelho Costa](https://github.com/gabrielzinCoelho)
-- [Heitor Ramos Vieira Rocha](https://github.com/heitor-vieira)
-
 ## Requisitos Funcionais
 
 ### Analisador Léxico
@@ -33,3 +27,9 @@ O objetivo do trabalho prático é desenvolver um compilador para uma mini lingu
     - discutir as dificuldades encontradas;
     - apresentar dois diagramas de transição (DFAs) referentes a classes de tokens; e
     - incluir um arquivo de teste e sua saída (não precisa ser grande, porém completo).
+
+## Autores
+
+- [Otávio Sbampato Andrade](https://github.com/otaviosbampato)
+- [Gabriel Coelho Costa](https://github.com/gabrielzinCoelho)
+- [Heitor Ramos Vieira Rocha](https://github.com/heitor-vieira)
