@@ -1,6 +1,6 @@
 // Teste básico com palavras-chave e identificadores
 if x
-  print y
+  print y // mostrar valor de y (saldo da conta)
 else
   read z
   

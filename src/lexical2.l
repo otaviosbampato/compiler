@@ -31,11 +31,17 @@ digit                   [0-9]
 letter                  [a-zA-Z]
 float                   ([-+])?({digit}+\.{digit}*|\.{digit}+)
 integer                 ([-+])?{digit}+
-identifier              {letter}(([{letter}{digit}_])*[{letter}{digit}])?
+identifier              [a-zA-Z]([a-zA-Z0-9_]*[a-zA-Z0-9])?
 singleLineComment       \/\/[^\n]*
 multilineComment        \/\*([^*]|\*+[^*/])*\*+\/
 
 %%
+
+{singleLineComment} {printLexema(yytext, "Single Line Comment"); incrementColumnCounter(yyleng);}
+
+{multilineComment} {printLexema(yytext, "Multi Line Comment"); incrementColumnCounter(yyleng);}
+
+{newline} { resetColumnCounter(); }
 
 if      {printLexema(yytext, "IF"); incrementColumnCounter(yyleng); }
 else    {printLexema(yytext, "ELSE"); incrementColumnCounter(yyleng); }
@@ -43,14 +49,11 @@ while   {printLexema(yytext, "WHILE"); incrementColumnCounter(yyleng); }
 print   {printLexema(yytext, "PRINT"); incrementColumnCounter(yyleng); }
 read    {printLexema(yytext, "READ"); incrementColumnCounter(yyleng); }
 
-
 {identifier} {printLexema(yytext, "ID"); incrementColumnCounter(yyleng); }
 
 {float} {printLexema(yytext, "FLOAT"); incrementColumnCounter(yyleng); }
 
 {integer} {printLexema(yytext, "INTEGER"); incrementColumnCounter(yyleng); }
-
-{newline} { resetColumnCounter(); }
 
 
 %%
