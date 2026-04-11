@@ -1,0 +1,16 @@
+/* Teste complexo com múltiplos tokens
+   e estrutura de controle */
+count = 0
+while count
+  if flag
+    read entrada
+    saida = entrada + 10.5
+    print saida
+  else
+    print -99
+    
+// Teste de identificadores válidos
+_variavel
+var_name
+VAR123
+nome_longo_de_variavel

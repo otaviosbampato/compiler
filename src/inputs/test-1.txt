@@ -1,0 +1,9 @@
+// Teste básico com palavras-chave e identificadores
+if x
+  print y
+else
+  read z
+  
+/* Comentário multilinha 
+   para demonstrar o lexer */
+while count

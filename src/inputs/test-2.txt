@@ -1,0 +1,10 @@
+// Teste com números inteiros e floats
+x = 42
+y = -123
+valor = 3.14
+taxa = -0.5
+resultado = .99
+pi = 2.14159
+
+if x
+  print resultado
