@@ -1,2 +1,5 @@
 teste.l
 *.yy.c
+*.o
+*/bin/*
+!*/bin/.gitkeep
