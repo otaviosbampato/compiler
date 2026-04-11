@@ -34,27 +34,33 @@ integer                 ([-+])?{digit}+
 identifier              [a-zA-Z]([a-zA-Z0-9_]*[a-zA-Z0-9])?
 singleLineComment       \/\/[^\n]*
 multilineComment        \/\*([^*]|\*+[^*/])*\*+\/
+invalidSequence         [^a-zA-Z0-9_ \t\n]+
 
 %%
 
-{singleLineComment} {printLexema(yytext, "Single Line Comment"); incrementColumnCounter(yyleng);}
-
-{multilineComment} {printLexema(yytext, "Multi Line Comment"); incrementColumnCounter(yyleng);}
+{ws} { incrementColumnCounter(yyleng); }
 
 {newline} { resetColumnCounter(); }
 
-if      {printLexema(yytext, "IF"); incrementColumnCounter(yyleng); }
-else    {printLexema(yytext, "ELSE"); incrementColumnCounter(yyleng); }
-while   {printLexema(yytext, "WHILE"); incrementColumnCounter(yyleng); }
-print   {printLexema(yytext, "PRINT"); incrementColumnCounter(yyleng); }
-read    {printLexema(yytext, "READ"); incrementColumnCounter(yyleng); }
+{singleLineComment} { printLexema(yytext, "Single Line Comment"); incrementColumnCounter(yyleng); }
 
-{identifier} {printLexema(yytext, "ID"); incrementColumnCounter(yyleng); }
+{multilineComment} { printLexema(yytext, "Multi Line Comment"); incrementColumnCounter(yyleng); }
 
-{float} {printLexema(yytext, "FLOAT"); incrementColumnCounter(yyleng); }
+if      { printLexema(yytext, "IF"); incrementColumnCounter(yyleng); }
+else    { printLexema(yytext, "ELSE"); incrementColumnCounter(yyleng); }
+while   { printLexema(yytext, "WHILE"); incrementColumnCounter(yyleng); }
+print   { printLexema(yytext, "PRINT"); incrementColumnCounter(yyleng); }
+read    { printLexema(yytext, "READ"); incrementColumnCounter(yyleng); }
 
-{integer} {printLexema(yytext, "INTEGER"); incrementColumnCounter(yyleng); }
+{identifier} { printLexema(yytext, "ID"); incrementColumnCounter(yyleng); }
 
+{float} { printLexema(yytext, "FLOAT"); incrementColumnCounter(yyleng); }
+
+{integer} { printLexema(yytext, "INTEGER"); incrementColumnCounter(yyleng); }
+
+{invalidSequence} { printLexema(yytext, "ERROR"); incrementColumnCounter(yyleng); }
+
+. { printLexema(yytext, "ERROR"); incrementColumnCounter(yyleng); }
 
 %%
 
