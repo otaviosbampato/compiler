@@ -95,8 +95,8 @@ ws                      [ \t]+
 newline                 [\n]
 digit                   [0-9]
 letter                  [a-zA-Z]
-float                   ([-+])?({digit}+\.{digit}*|\.{digit}+)
-integer                 ([-+])?{digit}+
+float                   ({digit}+\.{digit}*|\.{digit}+)
+integer                 {digit}+
 identifier              [a-zA-Z]([a-zA-Z0-9_]*[a-zA-Z0-9])? 
 singleLineComment       \/\/[^\n]*
 multilineComment        \/\*([^*]|\*+[^*/])*\*+\/

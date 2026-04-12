@@ -9,7 +9,7 @@ $
 abc@@def
 12#34
 _naoIniciaComLetra
-valor = 10;
-
+valor = 2 + 10;
+valor2 = 2-10;
 // Possível comentário não fechado
 /* comentario sem fechamento
