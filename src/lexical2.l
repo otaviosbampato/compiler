@@ -52,6 +52,30 @@ while   { printLexema(yytext, "WHILE"); incrementColumnCounter(yyleng); }
 print   { printLexema(yytext, "PRINT"); incrementColumnCounter(yyleng); }
 read    { printLexema(yytext, "READ"); incrementColumnCounter(yyleng); }
 
+"<="    { printLexema(yytext, "RELOP_LE"); incrementColumnCounter(yyleng); }
+">="    { printLexema(yytext, "RELOP_GE"); incrementColumnCounter(yyleng); }
+"!="    { printLexema(yytext, "RELOP_NE"); incrementColumnCounter(yyleng); }
+"=="    { printLexema(yytext, "RELOP_EQ"); incrementColumnCounter(yyleng); }
+"<"     { printLexema(yytext, "RELOP_LT"); incrementColumnCounter(yyleng); }
+">"     { printLexema(yytext, "RELOP_GT"); incrementColumnCounter(yyleng); }
+
+"+"     { printLexema(yytext, "PLUS"); incrementColumnCounter(yyleng); }
+"-"     { printLexema(yytext, "MINUS"); incrementColumnCounter(yyleng); }
+"**"    { printLexema(yytext, "POW"); incrementColumnCounter(yyleng); }
+"*"     { printLexema(yytext, "DOT"); incrementColumnCounter(yyleng); }
+"/"     { printLexema(yytext, "DIV"); incrementColumnCounter(yyleng); }
+
+"&&"    { printLexema(yytext, "AND"); incrementColumnCounter(yyleng); }
+"||"    { printLexema(yytext, "OR"); incrementColumnCounter(yyleng); }
+"~"     { printLexema(yytext, "NEG"); incrementColumnCounter(yyleng); }
+
+";"     { printLexema(yytext, "SC"); incrementColumnCounter(yyleng); }
+","     { printLexema(yytext, "COMMA"); incrementColumnCounter(yyleng); }
+"("     { printLexema(yytext, "OPEN_PAR"); incrementColumnCounter(yyleng); }
+")"     { printLexema(yytext, "CLOSE_PAR"); incrementColumnCounter(yyleng); }
+"{"     { printLexema(yytext, "OPEN_BRACKET"); incrementColumnCounter(yyleng); }
+"}"     { printLexema(yytext, "CLOSE_BRACKET"); incrementColumnCounter(yyleng); }
+
 {identifier} { printLexema(yytext, "ID"); incrementColumnCounter(yyleng); }
 
 {float} { printLexema(yytext, "FLOAT"); incrementColumnCounter(yyleng); }
