@@ -4,9 +4,24 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-int yyval;
+int yylval;
 int column_number = 1;
+
+#define TYPE_INT 1
+#define TYPE_FLOAT 2
+#define RELOP_LE 1
+#define RELOP_GE 2
+#define RELOP_NE 3
+#define RELOP_EQ 4
+#define RELOP_LT 5
+#define RELOP_GT 6
+#define LOGIC_AND 1
+#define LOGIC_OR 2
+#define LOGIC_NEG 3
+#define NUMBER_INT 1
+#define NUMBER_FLOAT 2
 
 
 /* Auxiliary Functions */
@@ -19,57 +34,57 @@ void incrementColumnCounter(int increment) {
     column_number += increment;
 }
 
-void printLexema(char *lexema, char *tokenClass){
+void printLexeme(char *lexeme, char *tokenClass){
   fprintf(yyout,"%d(%d): %s (%s)\n", yylineno,column_number,yytext, tokenClass);
 }
 
 /* Hash Declaration and Auxiliary Functions */
 
-#define TAM_TABELA 211  // tamanho da hash (número primo aumenta dispersão)
+#define TABLE_SIZE 211  // tamanho da hash (número primo aumenta dispersão)
 
 /* Estrutura do símbolo */
 typedef struct simbolo {
-    char *lexema;           // lexema string
+    char *lexeme;           // lexeme string
     char *tokenClass;        // token class (identifier)
-    int linha;              // lexema line
-    int coluna;             // lexema column
-    struct simbolo *prox;   // para colisões da hash (linked list)
-} Simbolo;
+    int line;              // lexeme line
+    int column;             // lexeme column
+    struct simbolo *next;   // para colisões da hash (linked list)
+} Symbol;
 
-Simbolo* tabela[TAM_TABELA] = {NULL};
+Symbol* table[TABLE_SIZE] = {NULL};
 
 /* Função hash */
-unsigned int hash(const char *lexema) {
+unsigned int hash(const char *lexeme) {
     unsigned int h = 0;
-    while (*lexema) {
-        h = (h << 4) + *lexema++;
+    while (*lexeme) {
+        h = (h << 4) + *lexeme++;
         unsigned int g = h & 0xF0000000L;
         if (g) h ^= g >> 24;
         h &= ~g;
     }
-    return h % TAM_TABELA;
+    return h % TABLE_SIZE;
 }
 
 /* Busca símbolo */
-Simbolo* buscar(const char* lexema) {
-    unsigned int pos = hash(lexema);
-    for (Simbolo* currentSymbolPtr = tabela[pos]; currentSymbolPtr != NULL; currentSymbolPtr = currentSymbolPtr->prox) {
-        if (strcmp(currentSymbolPtr->lexema, lexema) == 0) return currentSymbolPtr;
+Symbol* searchTable(const char* lexeme) {
+    unsigned int pos = hash(lexeme);
+    for (Symbol* currentSymbolPtr = table[pos]; currentSymbolPtr != NULL; currentSymbolPtr = currentSymbolPtr->next) {
+        if (strcmp(currentSymbolPtr->lexeme, lexeme) == 0) return currentSymbolPtr;
     }
     return NULL;
 }
 
 /* Insere símbolo */
-void inserir(const char* lexema, const char* tokenClass, int line, int column) {
-    if (buscar(lexema) != NULL) return; // evita duplicatas
-    unsigned int h = hash(lexema);
-    Simbolo* newSymbol = (Simbolo*) malloc(sizeof(Simbolo));
-    newSymbol->lexema = strdup(lexema);
+void insertTable(const char* lexeme, const char* tokenClass, int line, int column) {
+    if (searchTable(lexeme) != NULL) return; // evita duplicatas
+    unsigned int h = hash(lexeme);
+    Symbol* newSymbol = (Symbol*) malloc(sizeof(Symbol));
+    newSymbol->lexeme = strdup(lexeme);
     newSymbol->tokenClass = strdup(tokenClass);
     newSymbol->line = line;
     newSymbol->column = column;
-    newSymbol->prox = tabela[h];
-    tabela[h] = newSymbol;
+    newSymbol->next = table[h];
+    table[h] = newSymbol;
 }
 
 %}
@@ -105,82 +120,82 @@ invalidSequence         [^a-zA-Z0-9_ \t\n]+
 /* −−−−−−−−−−−−−−−−−−−−−−−−−−−−− Keywords −−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
 %}
 
-if      { printLexema(yytext, "IF"); incrementColumnCounter(yyleng);    }
-else    { printLexema(yytext, "ELSE"); incrementColumnCounter(yyleng);  }
-while   { printLexema(yytext, "WHILE"); incrementColumnCounter(yyleng); }
-print   { printLexema(yytext, "PRINT"); incrementColumnCounter(yyleng); }
-read    { printLexema(yytext, "READ"); incrementColumnCounter(yyleng);  }
+if      { printLexeme(yytext, "IF"); incrementColumnCounter(yyleng);    }
+else    { printLexeme(yytext, "ELSE"); incrementColumnCounter(yyleng);  }
+while   { printLexeme(yytext, "WHILE"); incrementColumnCounter(yyleng); }
+print   { printLexeme(yytext, "PRINT"); incrementColumnCounter(yyleng); }
+read    { printLexeme(yytext, "READ"); incrementColumnCounter(yyleng);  }
 
 %{
 /* −−−−−−−−−−−−−−−−−−−−−−−−−−−−− Type Definitions −−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
 %}
 
-int    { printLexema(yytext, "TYPE_INT"); incrementColumnCounter(yyleng);   }
-float  { printLexema(yytext, "TYPE_FLOAT"); incrementColumnCounter(yyleng); }
+int    { yylval = TYPE_INT; printLexeme(yytext, "TYPE"); incrementColumnCounter(yyleng); }
+float  { yylval = TYPE_FLOAT; printLexeme(yytext, "TYPE"); incrementColumnCounter(yyleng); }
 
 %{
 /* −−−−−−−−−−−−−−−−−−−−−−−−−−−−− Relational Operators −−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
 %}
 
-"<="    { printLexema(yytext, "RELOP_LE"); incrementColumnCounter(yyleng); }
-">="    { printLexema(yytext, "RELOP_GE"); incrementColumnCounter(yyleng); }
-"!="    { printLexema(yytext, "RELOP_NE"); incrementColumnCounter(yyleng); }
-"=="    { printLexema(yytext, "RELOP_EQ"); incrementColumnCounter(yyleng); }
-"<"     { printLexema(yytext, "RELOP_LT"); incrementColumnCounter(yyleng); }
-">"     { printLexema(yytext, "RELOP_GT"); incrementColumnCounter(yyleng); }
+"<="    { yylval = RELOP_LE; printLexeme(yytext, "RELOP"); incrementColumnCounter(yyleng); }
+">="    { yylval = RELOP_GE; printLexeme(yytext, "RELOP"); incrementColumnCounter(yyleng); }
+"!="    { yylval = RELOP_NE; printLexeme(yytext, "RELOP"); incrementColumnCounter(yyleng); }
+"=="    { yylval = RELOP_EQ; printLexeme(yytext, "RELOP"); incrementColumnCounter(yyleng); }
+"<"     { yylval = RELOP_LT; printLexeme(yytext, "RELOP"); incrementColumnCounter(yyleng); }
+">"     { yylval = RELOP_GT; printLexeme(yytext, "RELOP"); incrementColumnCounter(yyleng); }
 
 %{
 /* −−−−−−−−−−−−−−−−−−−−−−−−−−−−− Assignment Operators −−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
 %}
 
-"="     { printLexema(yytext, "ATT_OP"); incrementColumnCounter(yyleng); }
+"="     { printLexeme(yytext, "ASSIGN_OP"); incrementColumnCounter(yyleng); }
 
 %{
 /* −−−−−−−−−−−−−−−−−−−−−−−−−−−−− Arithmetic Operators −−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
 %}
 
-"+"     { printLexema(yytext, "PLUS"); incrementColumnCounter(yyleng);  }
-"-"     { printLexema(yytext, "MINUS"); incrementColumnCounter(yyleng); }
-"**"    { printLexema(yytext, "POW"); incrementColumnCounter(yyleng); }
-"*"     { printLexema(yytext, "DOT"); incrementColumnCounter(yyleng); }
-"/"     { printLexema(yytext, "DIV"); incrementColumnCounter(yyleng); }
+"+"     { printLexeme(yytext, "ARITH_OP_ADD"); incrementColumnCounter(yyleng); }
+"-"     { printLexeme(yytext, "ARITH_OP_SUB"); incrementColumnCounter(yyleng); }
+"**"    { printLexeme(yytext, "ARITH_OP_POW"); incrementColumnCounter(yyleng); }
+"*"     { printLexeme(yytext, "ARITH_OP_MUL"); incrementColumnCounter(yyleng); }
+"/"     { printLexeme(yytext, "ARITH_OP_DIV"); incrementColumnCounter(yyleng); }
 
 %{
 /* −−−−−−−−−−−−−−−−−−−−−−−−−−−−− Logical Operators −−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
 %}
 
-"&&"    { printLexema(yytext, "AND"); incrementColumnCounter(yyleng); }
-"||"    { printLexema(yytext, "OR"); incrementColumnCounter(yyleng);  }
-"~"     { printLexema(yytext, "NEG"); incrementColumnCounter(yyleng); }
+"&&"    { yylval = LOGIC_AND; printLexeme(yytext, "LOGIC_OP"); incrementColumnCounter(yyleng); }
+"||"    { yylval = LOGIC_OR; printLexeme(yytext, "LOGIC_OP"); incrementColumnCounter(yyleng);  }
+"~"     { yylval = LOGIC_NEG; printLexeme(yytext, "LOGIC_OP"); incrementColumnCounter(yyleng); }
 
 %{
 /* −−−−−−−−−−−−−−−−−−−−−−−−−−−−− Punctuation Symbols −−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
 %}
 
-";"     { printLexema(yytext, "SC"); incrementColumnCounter(yyleng); }
-","     { printLexema(yytext, "COMMA"); incrementColumnCounter(yyleng); }
-"("     { printLexema(yytext, "OPEN_PAR"); incrementColumnCounter(yyleng); }
-")"     { printLexema(yytext, "CLOSE_PAR"); incrementColumnCounter(yyleng); }
-"{"     { printLexema(yytext, "OPEN_BRACKET"); incrementColumnCounter(yyleng); }
-"}"     { printLexema(yytext, "CLOSE_BRACKET"); incrementColumnCounter(yyleng); }
+";"     { printLexeme(yytext, "PUNCT_SEMICOLON"); incrementColumnCounter(yyleng); }
+","     { printLexeme(yytext, "PUNCT_COMMA"); incrementColumnCounter(yyleng); }
+"("     { printLexeme(yytext, "PUNCT_OPEN_PAREN"); incrementColumnCounter(yyleng); }
+")"     { printLexeme(yytext, "PUNCT_CLOSE_PAREN"); incrementColumnCounter(yyleng); }
+"{"     { printLexeme(yytext, "PUNCT_OPEN_BRACE"); incrementColumnCounter(yyleng); }
+"}"     { printLexeme(yytext, "PUNCT_CLOSE_BRACE"); incrementColumnCounter(yyleng); }
 
 %{
 /* −−−−−−−−−−−−−−−−−−−−−−−−−−−−− Identifiers and Numbers −−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
 %}
 
-{identifier} { printLexema(yytext, "ID"); incrementColumnCounter(yyleng); }
+{identifier} { insertTable(yytext, "IDENTIFIER", yylineno, column_number); printLexeme(yytext, "IDENTIFIER"); incrementColumnCounter(yyleng); }
 
-{float} { printLexema(yytext, "FLOAT"); incrementColumnCounter(yyleng); }
+{float} { yylval = NUMBER_FLOAT; printLexeme(yytext, "NUMBER"); incrementColumnCounter(yyleng); }
 
-{integer} { printLexema(yytext, "INTEGER"); incrementColumnCounter(yyleng); }
+{integer} { yylval = NUMBER_INT; printLexeme(yytext, "NUMBER"); incrementColumnCounter(yyleng); }
 
 %{
 /* −−−−−−−−−−−−−−−−−−−−−−−−−−−−− Errors −−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
 %}
 
-{invalidSequence} { printLexema(yytext, "ERROR"); incrementColumnCounter(yyleng); }
+{invalidSequence} { printLexeme(yytext, "LEXICAL_ERROR"); incrementColumnCounter(yyleng); }
 
-. { printLexema(yytext, "ERROR"); incrementColumnCounter(yyleng); }
+. { printLexeme(yytext, "LEXICAL_ERROR"); incrementColumnCounter(yyleng); }
 
 %%
 
@@ -195,5 +210,15 @@ int main(int argc, char **argv) {
     }
     
     yylex();
+    printf("\n--- TABELA DE SÍMBOLOS ---\n");
+    printf("\nToken         Lexema\n");
+    printf("----------------------\n");
+    for (int i = 0; i < TABLE_SIZE; i++) {
+        for (Symbol* s = table[i]; s != NULL; s = s->next) {
+            printf("%-13s %s\n", s->tokenClass, s->lexeme);
+        }
+    }
+
+    fclose(yyin);
     return 0;
 }
