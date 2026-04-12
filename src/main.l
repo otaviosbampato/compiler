@@ -101,6 +101,7 @@ identifier              [a-zA-Z]([a-zA-Z0-9_]*[a-zA-Z0-9])?
 singleLineComment       \/\/[^\n]*
 multilineComment        \/\*([^*]|\*+[^*/])*\*+\/
 invalidSequence         [^a-zA-Z0-9_ \t\n]+
+invalidIdentifier       (_+{identifier}|{digit}+{identifier}|{identifier}_+)
 
 %%
 
@@ -182,6 +183,8 @@ float  { yylval = TYPE_FLOAT; printLexeme(yytext, "TYPE (TYPE_FLOAT)"); incremen
 %{
 /* −−−−−−−−−−−−−−−−−−−−−−−−−−−−− Identifiers and Numbers −−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
 %}
+
+{invalidIdentifier} { printLexeme(yytext, "LEXICAL_ERROR"); incrementColumnCounter(yyleng); }
 
 {identifier} { insertTable(yytext, "IDENTIFIER", yylineno, column_number); printLexeme(yytext, "IDENTIFIER"); incrementColumnCounter(yyleng); }
 
