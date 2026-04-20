@@ -100,8 +100,14 @@ integer                 {digit}+
 identifier              [a-zA-Z]([a-zA-Z0-9_]*[a-zA-Z0-9])? 
 singleLineComment       \/\/[^\n]*
 multilineComment        \/\*([^*]|\*+[^*/])*\*+\/
+/* TODO: remove 'invalidSequence', 'invalidIdentifier' */
 invalidSequence         [^a-zA-Z0-9_ \t\n]+
 invalidIdentifier       (_+{identifier}|{digit}+{identifier}|{identifier}_+)
+
+/* 
+invalidSeq + ..id: tentativa de deixar o analisador mais compreensível; já detectávamos erros com precisão, e decidimos
+fazer essa tentativa de agrupar caracteres em um erro só. no entanto a política de maior casamento fodeu nós
+*/
 
 %%
 
