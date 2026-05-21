@@ -5,8 +5,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "parser.h"
 
-int yylval;
+extern int yylval;
 int column_number = 1;
 
 #define TYPE_INT 1
@@ -112,7 +113,7 @@ multilineComment        \/\*([^*]|\*+[^*/])*\*+\/
 
 {ws} { incrementColumnCounter(yyleng); }
 
-{newline} { resetColumnCounter(); }
+{newline} { resetColumnCounter(); return '\n'; }
 
 {singleLineComment} { incrementColumnCounter(yyleng); } 
 
@@ -156,11 +157,11 @@ float  { yylval = TYPE_FLOAT; printLexeme(yytext, "TYPE (TYPE_FLOAT)"); incremen
 /* −−−−−−−−−−−−−−−−−−−−−−−−−−−−− Arithmetic Operators −−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
 %}
 
-"+"     { printLexeme(yytext, "ARITH_OP_ADD"); incrementColumnCounter(yyleng); }
-"-"     { printLexeme(yytext, "ARITH_OP_SUB"); incrementColumnCounter(yyleng); }
-"**"    { printLexeme(yytext, "ARITH_OP_POW"); incrementColumnCounter(yyleng); }
-"*"     { printLexeme(yytext, "ARITH_OP_MUL"); incrementColumnCounter(yyleng); }
-"/"     { printLexeme(yytext, "ARITH_OP_DIV"); incrementColumnCounter(yyleng); }
+"+"     { printLexeme(yytext, "ARITH_OP_ADD"); incrementColumnCounter(yyleng); return yytext[0]; }
+"-"     { printLexeme(yytext, "ARITH_OP_SUB"); incrementColumnCounter(yyleng); return yytext[0]; }
+"**"    { printLexeme(yytext, "ARITH_OP_POW"); incrementColumnCounter(yyleng); /* FAZER */ }
+"*"     { printLexeme(yytext, "ARITH_OP_MUL"); incrementColumnCounter(yyleng); return yytext[0]; }
+"/"     { printLexeme(yytext, "ARITH_OP_DIV"); incrementColumnCounter(yyleng); return yytext[0]; }
 
 %{
 /* −−−−−−−−−−−−−−−−−−−−−−−−−−−−− Logical Operators −−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
@@ -189,7 +190,7 @@ float  { yylval = TYPE_FLOAT; printLexeme(yytext, "TYPE (TYPE_FLOAT)"); incremen
 
 {float} { yylval = NUMBER_FLOAT; printLexeme(yytext, "NUMBER (NUMBER_FLOAT)"); incrementColumnCounter(yyleng); }
 
-{integer} { yylval = NUMBER_INT; printLexeme(yytext, "NUMBER (NUMBER_INT)"); incrementColumnCounter(yyleng); }
+{integer} { yylval = NUMBER_INT; printLexeme(yytext, "NUMBER (NUMBER_INT)"); incrementColumnCounter(yyleng); return DIGIT; }
 
 %{
 /* −−−−−−−−−−−−−−−−−−−−−−−−−−−−− Errors −−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
@@ -199,17 +200,7 @@ float  { yylval = TYPE_FLOAT; printLexeme(yytext, "TYPE (TYPE_FLOAT)"); incremen
 
 %%
 
-int main(int argc, char **argv) {
-
-    if (argc > 1) {
-        yyin = fopen(argv[1], "r");
-        if (!yyin) {
-            perror("Error opening file");
-            return 1;
-        }
-    }
-    
-    yylex();
+void printSymbolTable() {
     printf("\n--- TABELA DE SÍMBOLOS ---\n");
     printf("\nPos.  Token         Lexema\n");
     printf("----------------------------\n");
@@ -218,7 +209,4 @@ int main(int argc, char **argv) {
             printf("%-5d %-13s %s\n", s->pos, s->tokenClass, s->lexeme);
         }
     }
-
-    fclose(yyin);
-    return 0;
 }
