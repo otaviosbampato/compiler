@@ -33,6 +33,7 @@ void yyerror(const char *s) {
     fprintf(stderr, "Error: %s\n", s);
 }
 
+extern void printSymbolTable(); // func do lexer pra printar a tabela
 int main(int argc, char **argv) {
     extern FILE *yyin;
     if (argc > 1) {
@@ -42,6 +43,11 @@ int main(int argc, char **argv) {
             return 1;
         }
     }
+    // roda o parsing, que por sua vez roda o lex
     yyparse();
+    
+    // printa a tabela de símbolos
+    printSymbolTable();
+
     return 0;
 }
