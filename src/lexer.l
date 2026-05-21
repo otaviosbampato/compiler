@@ -212,7 +212,7 @@ int main(int argc, char **argv) {
     yylex();
     printf("\n--- TABELA DE SÍMBOLOS ---\n");
     printf("\nPos.  Token         Lexema\n");
-    printf("-----------------------------\n");
+    printf("----------------------------\n");
     for (int i = 0; i < TABLE_SIZE; i++) {
         for (Symbol* s = table[i]; s != NULL; s = s->next) {
             printf("%-5d %-13s %s\n", s->pos, s->tokenClass, s->lexeme);
