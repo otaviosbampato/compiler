@@ -34,6 +34,8 @@ void yyerror(const char *s) {
 }
 
 extern void printSymbolTable(); // func do lexer pra printar a tabela
+extern int symbol_count;
+
 int main(int argc, char **argv) {
     extern FILE *yyin;
     if (argc > 1) {
@@ -45,9 +47,10 @@ int main(int argc, char **argv) {
     }
     // roda o parsing, que por sua vez roda o lex
     yyparse();
-    
-    // printa a tabela de símbolos
-    printSymbolTable();
+
+    if (symbol_count > 1) {
+        printSymbolTable();
+    }
 
     return 0;
 }
