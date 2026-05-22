@@ -9,23 +9,118 @@ void yyerror(const char *s);
 
 %}
 
-%token DIGIT /*Vemdo analisador léxico*/
+/* −−−−−−−−−−−−−−−−−−−− Tokens provenientes do analisador léxico −−−−−−−−−−−−−−−−−−−−− */
+
+%token CHAR
+%token COMMA
+%token FLOAT
+%token ID
+%token INT
+%token SEMI
+
+%token NUMBER
+
+%token DIGIT 
+
+/* −−−−−−−−−−−−−−−−−−−−−−−−−−−−− Definição de Precedência −−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
+
+%right ASSIGN
+%left OR
+%left AND
+%left EQ NE
+%left LT GT LE GE
+%left PLUS MINUS
+%left MULT DIV
+%right NOT
+%right UMINUS
 
 %%
-line : expr '\n' { printf("%d\n", $1); }
-;
 
-expr : expr '+' term { $$ = $1 + $3; }
-| term
-;
+program
+  : stmt_list
+  ;
 
-term : term '*' factor { $$ = $1 * $3; }
-| factor
-;
+stmt_list
+  : stmt_list stmt
+  | /* vazio */
+  ;
 
-factor : '(' expr ')' { $$ = $2; }
-| DIGIT
-;
+stmt
+  : var_decl
+  | assign_stmt
+  | if_stmt
+  | while_stmt
+  | print_stmt
+  | read_stmt
+  | block
+  ;
+
+block
+  : '{' stmt_list '}'
+  ;
+
+var_decl
+  : type id_list SEMI
+  ;
+
+id_list
+  : id_list COMMA id_decl
+  | id_decl
+  ;
+
+id_decl
+  : ID
+  | ID ASSIGN expr
+  ;
+
+type        
+  : INT
+  | FLOAT
+  | CHAR
+  | BOOLEAN
+  ;
+
+assign_stmt
+  : expr SEMI
+  ;
+
+primary_expr
+  : ID
+  | literal
+  | LPAREN expr RPAREN
+
+literal
+  : INTEGER_LITERAL
+  | FLOAT_LITERAL
+  | CHAR_LITERAL
+  | TRUE
+  | FALSE
+
+expr
+  : ID ASSIGN expr
+  
+  | expr OR expr
+  | expr AND expr
+
+  | expr EQ expr
+  | expr NE expr
+
+  | expr LT expr
+  | expr GT expr
+  | expr LE expr
+  | expr GE expr
+
+  | expr PLUS expr
+  | expr MINUS expr
+
+  | expr MULT expr
+  | expr DIV expr
+
+  | MINUS expr %prec UMINUS
+  | NOT expr %prec NOT
+
+  | primary_expr
+  ;
 
 %%
 
