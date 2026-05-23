@@ -164,9 +164,9 @@ float  { yylval = TYPE_FLOAT; printLexeme(yytext, "TYPE (TYPE_FLOAT)"); incremen
 /* −−−−−−−−−−−−−−−−−−−−−−−−−−−−− Logical Operators −−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
 %}
 
-"&&"    { yylval = AND; printLexeme(yytext, "AND"); incrementColumnCounter(yyleng); return AND; }
-"||"    { yylval = OR; printLexeme(yytext, "OR"); incrementColumnCounter(yyleng); return OR; }
-"~"     { yylval = NOT; printLexeme(yytext, "NOT"); incrementColumnCounter(yyleng); return NOT; }
+"&&"    { printLexeme(yytext, "AND"); incrementColumnCounter(yyleng); return AND; }
+"||"    { printLexeme(yytext, "OR"); incrementColumnCounter(yyleng); return OR; }
+"~"     { printLexeme(yytext, "NOT"); incrementColumnCounter(yyleng); return NOT; }
 
 %{
 /* −−−−−−−−−−−−−−−−−−−−−−−−−−−−− Punctuation Symbols −−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
@@ -185,9 +185,9 @@ float  { yylval = TYPE_FLOAT; printLexeme(yytext, "TYPE (TYPE_FLOAT)"); incremen
 
 {identifier} { insertTable(yytext, "ID", yylineno, column_number); printLexeme(yytext, "ID"); incrementColumnCounter(yyleng); return ID; }
 
-{float} { yylval = NUMBER_FLOAT; printLexeme(yytext, "NUMBER (NUMBER_FLOAT)"); incrementColumnCounter(yyleng); return DIGIT; }
+{float} { yylval = atof(yytext); printLexeme(yytext, "FLOAT_LITERAL"); incrementColumnCounter(yyleng); return FLOAT_LITERAL; }
 
-{integer} { yylval = atoi(yytext); printLexeme(yytext, "NUMBER (NUMBER_INT)"); incrementColumnCounter(yyleng); return DIGIT; }
+{integer} { yylval = atoi(yytext); printLexeme(yytext, "INTEGER_LITERAL"); incrementColumnCounter(yyleng); return INTEGER_LITERAL; }
 
 %{
 /* −−−−−−−−−−−−−−−−−−−−−−−−−−−−− Errors −−−−−−−−−−−−−−−−−−−−−−−−−−−−− */

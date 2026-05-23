@@ -9,6 +9,8 @@ void yyerror(const char *s);
 
 %}
 
+%define api.value.type {double} /*Para indicar que lidaremos com double*/
+
 /* −−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−− Lexer Tokens −−−−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
 
 %token IF
@@ -41,7 +43,8 @@ void yyerror(const char *s);
 %token PUNCT_CLOSE_BRACE
 
 %token ID
-%token DIGIT;
+%token INTEGER_LITERAL
+%token FLOAT_LITERAL
 
 /* −−−−−−−−−−−−−−−−−−−−−−−−−−−−− Definição de Precedência −−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
 
@@ -69,12 +72,20 @@ stmt_list
 stmt
   : var_decl
   | assign_stmt
-  | if_stmt
-  | while_stmt
-  | print_stmt
-  | read_stmt
   | block
   ;
+
+  /*
+    stmt
+    : var_decl
+    | assign_stmt
+    | if_stmt
+    | while_stmt
+    | print_stmt
+    | read_stmt
+    | block
+    ;
+  */
 
 block
   : PUNCT_OPEN_BRACE stmt_list PUNCT_CLOSE_BRACE
@@ -104,7 +115,8 @@ primary_expr
   | PUNCT_OPEN_PAREN expr PUNCT_CLOSE_PAREN
 
 literal
-  : DIGIT
+  : INTEGER_LITERAL
+  | FLOAT_LITERAL
   ;
 
 expr
