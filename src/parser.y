@@ -113,6 +113,7 @@ primary_expr
   : ID
   | literal
   | PUNCT_OPEN_PAREN expr PUNCT_CLOSE_PAREN
+  ;
 
 literal
   : INTEGER_LITERAL

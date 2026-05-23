@@ -537,9 +537,9 @@ static const yytype_int8 yytranslate[] =
 static const yytype_uint8 yyrline[] =
 {
        0,    64,    64,    68,    69,    73,    74,    75,    91,    95,
-      99,   100,   104,   105,   109,   113,   114,   115,   118,   119,
-     123,   125,   126,   128,   129,   131,   132,   134,   135,   137,
-     138,   140
+      99,   100,   104,   105,   109,   113,   114,   115,   119,   120,
+     124,   126,   127,   129,   130,   132,   133,   135,   136,   138,
+     139,   141
 };
 #endif
 
@@ -1341,7 +1341,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 143 "src/parser.y"
+#line 144 "src/parser.y"
 
 
 void yyerror(const char *s) {
