@@ -12,15 +12,12 @@ int column_number = 1;
 
 #define TYPE_INT 1
 #define TYPE_FLOAT 2
+#define EQOP_NE 1
+#define EQOP_EQ 2
 #define RELOP_LE 1
 #define RELOP_GE 2
-#define RELOP_NE 3
-#define RELOP_EQ 4
-#define RELOP_LT 5
-#define RELOP_GT 6
-#define LOGIC_AND 1
-#define LOGIC_OR 2
-#define LOGIC_NEG 3
+#define RELOP_LT 3
+#define RELOP_GT 4
 #define NUMBER_INT 1
 #define NUMBER_FLOAT 2
 
@@ -142,8 +139,8 @@ float  { yylval = TYPE_FLOAT; printLexeme(yytext, "TYPE (TYPE_FLOAT)"); incremen
 
 "<="    { yylval = RELOP_LE; printLexeme(yytext, "RELOP (RELOP_LE)"); incrementColumnCounter(yyleng); return RELOP; }
 ">="    { yylval = RELOP_GE; printLexeme(yytext, "RELOP (RELOP_GE)"); incrementColumnCounter(yyleng); return RELOP; }
-"!="    { yylval = RELOP_NE; printLexeme(yytext, "RELOP (RELOP_NE)"); incrementColumnCounter(yyleng); return RELOP; }
-"=="    { yylval = RELOP_EQ; printLexeme(yytext, "RELOP (RELOP_EQ)"); incrementColumnCounter(yyleng); return RELOP; }
+"!="    { yylval = EQOP_NE; printLexeme(yytext, "EQOP (EQOP_NE)"); incrementColumnCounter(yyleng); return EQOP; }
+"=="    { yylval = EQOP_EQ; printLexeme(yytext, "EQOP (EQOP_EQ)"); incrementColumnCounter(yyleng); return EQOP; }
 "<"     { yylval = RELOP_LT; printLexeme(yytext, "RELOP (RELOP_LT)"); incrementColumnCounter(yyleng); return RELOP; }
 ">"     { yylval = RELOP_GT; printLexeme(yytext, "RELOP (RELOP_GT)"); incrementColumnCounter(yyleng); return RELOP; }
 
@@ -167,9 +164,9 @@ float  { yylval = TYPE_FLOAT; printLexeme(yytext, "TYPE (TYPE_FLOAT)"); incremen
 /* −−−−−−−−−−−−−−−−−−−−−−−−−−−−− Logical Operators −−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
 %}
 
-"&&"    { yylval = LOGIC_AND; printLexeme(yytext, "LOGIC_OP (LOGIC_AND)"); incrementColumnCounter(yyleng); return LOGIC_OP; }
-"||"    { yylval = LOGIC_OR; printLexeme(yytext, "LOGIC_OP (LOGIC_OR)"); incrementColumnCounter(yyleng); return LOGIC_OP; }
-"~"     { yylval = LOGIC_NEG; printLexeme(yytext, "LOGIC_OP (LOGIC_NEG)"); incrementColumnCounter(yyleng); return LOGIC_OP; }
+"&&"    { yylval = AND; printLexeme(yytext, "AND"); incrementColumnCounter(yyleng); return AND; }
+"||"    { yylval = OR; printLexeme(yytext, "OR"); incrementColumnCounter(yyleng); return OR; }
+"~"     { yylval = NOT; printLexeme(yytext, "NOT"); incrementColumnCounter(yyleng); return NOT; }
 
 %{
 /* −−−−−−−−−−−−−−−−−−−−−−−−−−−−− Punctuation Symbols −−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
@@ -186,7 +183,7 @@ float  { yylval = TYPE_FLOAT; printLexeme(yytext, "TYPE (TYPE_FLOAT)"); incremen
 /* −−−−−−−−−−−−−−−−−−−−−−−−−−−−− Identifiers and Numbers −−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
 %}
 
-{identifier} { insertTable(yytext, "IDENTIFIER", yylineno, column_number); printLexeme(yytext, "IDENTIFIER"); incrementColumnCounter(yyleng); return IDENTIFIER; }
+{identifier} { insertTable(yytext, "ID", yylineno, column_number); printLexeme(yytext, "ID"); incrementColumnCounter(yyleng); return ID; }
 
 {float} { yylval = NUMBER_FLOAT; printLexeme(yytext, "NUMBER (NUMBER_FLOAT)"); incrementColumnCounter(yyleng); return DIGIT; }
 

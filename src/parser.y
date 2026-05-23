@@ -45,8 +45,8 @@ void yyerror(const char *s);
 %right ASSIGN
 %left OR
 %left AND
-%left EQ NE
-%left LT GT LE GE
+%left EQOP
+%left RELOP
 %left PLUS MINUS
 %left MULT DIV
 %right NOT
@@ -74,15 +74,15 @@ stmt
   ;
 
 block
-  : '{' stmt_list '}'
+  : PUNCT_OPEN_BRACE stmt_list PUNCT_CLOSE_BRACE
   ;
 
 var_decl
-  : type id_list SEMI
+  : TYPE id_list PUNCT_SEMICOLON
   ;
 
 id_list
-  : id_list COMMA id_decl
+  : id_list PUNCT_COMMA id_decl
   | id_decl
   ;
 
@@ -91,42 +91,27 @@ id_decl
   | ID ASSIGN expr
   ;
 
-type        
-  : INT
-  | FLOAT
-  | CHAR
-  | BOOLEAN
-  ;
-
 assign_stmt
-  : expr SEMI
+  : expr PUNCT_SEMICOLON
   ;
 
 primary_expr
   : ID
   | literal
-  | LPAREN expr RPAREN
+  | PUNCT_OPEN_PAREN expr PUNCT_CLOSE_PAREN
 
 literal
-  : INTEGER_LITERAL
-  | FLOAT_LITERAL
-  | CHAR_LITERAL
-  | TRUE
-  | FALSE
+  : DIGIT
+  ;
 
 expr
   : ID ASSIGN expr
   
   | expr OR expr
   | expr AND expr
-
-  | expr EQ expr
-  | expr NE expr
-
-  | expr LT expr
-  | expr GT expr
-  | expr LE expr
-  | expr GE expr
+  
+  | expr EQOP expr
+  | expr RELOP expr
 
   | expr PLUS expr
   | expr MINUS expr
