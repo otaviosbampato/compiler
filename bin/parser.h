@@ -54,14 +54,40 @@ extern int yydebug;
     YYEOF = 0,                     /* "end of file"  */
     YYerror = 256,                 /* error  */
     YYUNDEF = 257,                 /* "invalid token"  */
-    DIGIT = 258                    /* DIGIT  */
+    IF = 258,                      /* IF  */
+    ELSE = 259,                    /* ELSE  */
+    WHILE = 260,                   /* WHILE  */
+    PRINT = 261,                   /* PRINT  */
+    READ = 262,                    /* READ  */
+    TYPE = 263,                    /* TYPE  */
+    RELOP = 264,                   /* RELOP  */
+    EQOP = 265,                    /* EQOP  */
+    AND = 266,                     /* AND  */
+    OR = 267,                      /* OR  */
+    NOT = 268,                     /* NOT  */
+    ASSIGN = 269,                  /* ASSIGN  */
+    PLUS = 270,                    /* PLUS  */
+    MINUS = 271,                   /* MINUS  */
+    POW = 272,                     /* POW  */
+    MULT = 273,                    /* MULT  */
+    DIV = 274,                     /* DIV  */
+    PUNCT_SEMICOLON = 275,         /* PUNCT_SEMICOLON  */
+    PUNCT_COMMA = 276,             /* PUNCT_COMMA  */
+    PUNCT_OPEN_PAREN = 277,        /* PUNCT_OPEN_PAREN  */
+    PUNCT_CLOSE_PAREN = 278,       /* PUNCT_CLOSE_PAREN  */
+    PUNCT_OPEN_BRACE = 279,        /* PUNCT_OPEN_BRACE  */
+    PUNCT_CLOSE_BRACE = 280,       /* PUNCT_CLOSE_BRACE  */
+    ID = 281,                      /* ID  */
+    INTEGER_LITERAL = 282,         /* INTEGER_LITERAL  */
+    FLOAT_LITERAL = 283,           /* FLOAT_LITERAL  */
+    UMINUS = 284                   /* UMINUS  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef int YYSTYPE;
+typedef double YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
 #endif

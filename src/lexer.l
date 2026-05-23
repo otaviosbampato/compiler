@@ -7,7 +7,7 @@
 #include <string.h>
 #include "parser.h"
 
-extern int yylval;
+extern double yylval;
 int column_number = 1;
 
 #define TYPE_INT 1
@@ -156,7 +156,7 @@ float  { yylval = TYPE_FLOAT; printLexeme(yytext, "TYPE (TYPE_FLOAT)"); incremen
 
 "+"     { printLexeme(yytext, "ARITH_OP_ADD"); incrementColumnCounter(yyleng); return PLUS; }
 "-"     { printLexeme(yytext, "ARITH_OP_SUB"); incrementColumnCounter(yyleng); return MINUS; }
-"**"    { printLexeme(yytext, "ARITH_OP_POW"); incrementColumnCounter(yyleng); return POW }
+"**"    { printLexeme(yytext, "ARITH_OP_POW"); incrementColumnCounter(yyleng); return POW; }
 "*"     { printLexeme(yytext, "ARITH_OP_MUL"); incrementColumnCounter(yyleng); return MULT; }
 "/"     { printLexeme(yytext, "ARITH_OP_DIV"); incrementColumnCounter(yyleng); return DIV; }
 
