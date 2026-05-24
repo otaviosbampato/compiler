@@ -190,11 +190,11 @@ float  { yylval.num = TYPE_FLOAT; printLexeme(yytext, "TYPE (TYPE_FLOAT)"); incr
 
 void printSymbolTable() {
     printf("\n--- TABELA DE SÍMBOLOS ---\n");
-    printf("\nPos.  Token         Lexema\n");
-    printf("----------------------------\n");
+    printf("\nPos.  Token         Lexema           Valor\n");
+    printf("---------------------------------------------\n");
     for (int i = 0; i < TABLE_SIZE; i++) {
         for (Symbol* s = table[i]; s != NULL; s = s->next) {
-            printf("%-5d %-13s %s\n", s->pos, s->tokenClass, s->lexeme);
+            printf("%-5d %-13s %-16s %g\n", s->pos, s->tokenClass, s->lexeme, s->value);
         }
     }
 }
