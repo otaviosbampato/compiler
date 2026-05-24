@@ -7,6 +7,10 @@ int yylex(void);
 
 void yyerror(const char *s);
 
+/* Forward declaration of Symbol struct and searchTable function from lexer */
+typedef struct simbolo Symbol;
+extern Symbol* searchTable(const char* lexeme);
+
 %}
 
 %define api.value.type {double} /*Para indicar que lidaremos com double*/
@@ -101,18 +105,39 @@ id_list
   ;
 
 id_decl
-  : ID
-  | ID ASSIGN expr
+  : ID { printf("Declarando variavel: %s\n", $1); $$ = 0.0; }
+  | ID ASSIGN expr { 
+      printf("Atribuindo valor na declaracao de: %s\n", $1);
+      Symbol *sym = searchTable($1);
+      if (sym) {
+          sym->value = $3;
+          printf("  Inicializado com valor: %g\n", $3);
+          $$ = $3;
+      } else {
+          printf("  Nao encontrado na tabela de simbolos!\n");
+          $$ = 0.0;
+      }
+  }
   ;
 
 assign_stmt
-  : expr PUNCT_SEMICOLON
+  : expr PUNCT_SEMICOLON { printf("Resultado da expressao: %g\n", $1); }
   ;
 
 primary_expr
-  : ID
+  : ID { 
+      printf("Consultando tabela de simbolos para: %s\n", $1);
+      Symbol *sym = searchTable($1);
+      if (sym) {
+          printf("  Encontrado na posicao %d, valor: %g\n", sym->pos, sym->value);
+          $$ = sym->value;
+      } else {
+          printf("  Nao encontrado!\n");
+          $$ = 0.0;
+      }
+  }
   | literal
-  | PUNCT_OPEN_PAREN expr PUNCT_CLOSE_PAREN
+  | PUNCT_OPEN_PAREN expr PUNCT_CLOSE_PAREN { $$ = $2; }
   ;
 
 literal
@@ -121,22 +146,38 @@ literal
   ;
 
 expr
-  : ID ASSIGN expr
+  : ID ASSIGN expr { 
+      printf("Assigning to %s: %g\n", $1, $3);
+      Symbol *sym = searchTable($1);
+      if (sym) {
+          sym->value = $3;
+          printf("  Atualizado na tabela de simbolos (posicao %d)\n", sym->pos);
+      }
+      $$ = $3; 
+  }
   
-  | expr OR expr
-  | expr AND expr
+  | expr OR expr { $$ = $1 || $3; }
+  | expr AND expr { $$ = $1 && $3; }
 
-  | expr EQOP expr
-  | expr RELOP expr
+  | expr EQOP expr { $$ = $1 == $3; }
+  | expr RELOP expr { 
+      switch((int)$2) {
+          case 1: $$ = $1 <= $3; break;  /* RELOP_LE */
+          case 2: $$ = $1 >= $3; break;  /* RELOP_GE */
+          case 3: $$ = $1 < $3; break;   /* RELOP_LT */
+          case 4: $$ = $1 > $3; break;   /* RELOP_GT */
+          default: $$ = 0;
+      }
+  }
 
-  | expr PLUS expr
-  | expr MINUS expr
+  | expr PLUS expr { $$ = $1 + $3; }
+  | expr MINUS expr { $$ = $1 - $3; }
 
-  | expr MULT expr
-  | expr DIV expr
+  | expr MULT expr { $$ = $1 * $3; }
+  | expr DIV expr { $$ = $1 / $3; }
 
-  | MINUS expr %prec UMINUS
-  | NOT expr %prec NOT
+  | MINUS expr %prec UMINUS { $$ = -$2; }
+  | NOT expr %prec NOT { $$ = ~$2; }
 
   | primary_expr
   ;

@@ -49,6 +49,7 @@ typedef struct simbolo {
     char *tokenClass;        // token class (identifier)
     int line;              // lexeme line
     int column;             // lexeme column
+    double value;           // runtime value (inicializado em 0.0)
     struct simbolo *next;   // para colisões da hash (linked list)
 } Symbol;
 
@@ -85,6 +86,7 @@ void insertTable(const char* lexeme, const char* tokenClass, int line, int colum
     newSymbol->tokenClass = strdup(tokenClass);
     newSymbol->line = line;
     newSymbol->column = column;
+    newSymbol->value = 0.0;
     newSymbol->next = table[h];
     table[h] = newSymbol;
 }
