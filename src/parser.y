@@ -74,20 +74,9 @@ stmt
   | if_stmt
   | while_stmt
   | print_stmt
+  | read_stmt
   | block
   ;
-
-  /*
-    stmt
-    : var_decl
-    | assign_stmt
-    | if_stmt
-    | while_stmt
-    | print_stmt
-    | read_stmt
-    | block
-    ;
-  */
 
 block
   : PUNCT_OPEN_BRACE stmt_list PUNCT_CLOSE_BRACE
@@ -134,6 +123,15 @@ print_list
   | expr
   ;
 
+read_stmt
+  : READ PUNCT_OPEN_PAREN read_list PUNCT_CLOSE_PAREN PUNCT_SEMICOLON
+  ;
+
+read_list
+  : read_list PUNCT_COMMA ID
+  | ID
+  ;
+
 primary_expr
   : ID
   | literal
@@ -143,7 +141,7 @@ primary_expr
 literal
   : INTEGER_LITERAL
   | FLOAT_LITERAL
-  | STR_LITERAL;
+  | STR_LITERAL
   ;
 
 expr

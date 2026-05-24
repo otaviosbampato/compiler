@@ -17,3 +17,6 @@ print(a && b);
 print(a, 32, 32., "banana");
 
 // print(getYear()); ERRO: print de func
+
+read(a, b, c, d);
+read(x);
