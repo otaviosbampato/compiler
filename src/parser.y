@@ -119,6 +119,7 @@ stmt_list
 stmt
   : var_decl
   | assign_stmt
+  | if_stmt
   | block
   ;
 
@@ -157,6 +158,16 @@ id_decl
 
 assign_stmt
   : expr PUNCT_SEMICOLON { printf("Resultado da expressao: %g\n", $1); }
+  ;
+
+if_stmt
+  : IF PUNCT_OPEN_PAREN expr PUNCT_CLOSE_PAREN block else_clause
+  ;
+
+else_clause
+  : /* vazio */
+  | ELSE block
+  | ELSE if_stmt
   ;
 
 primary_expr
