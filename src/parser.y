@@ -72,6 +72,7 @@ stmt
   | assign_stmt
   | if_stmt
   | while_stmt
+  | print_stmt
   | block
   ;
 
@@ -121,6 +122,15 @@ else_clause
 
 while_stmt
   : WHILE PUNCT_OPEN_PAREN expr PUNCT_CLOSE_PAREN block
+  ;
+
+print_stmt
+  : PRINT PUNCT_OPEN_PAREN print_list PUNCT_CLOSE_PAREN PUNCT_SEMICOLON
+  ;
+
+print_list
+  : print_list PUNCT_COMMA expr
+  | expr
   ;
 
 primary_expr

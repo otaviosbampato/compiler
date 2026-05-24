@@ -1,0 +1,17 @@
+print(a);
+
+// print(); ERRO: print sem arg
+
+print("banana");
+print(32.);
+print(32);
+
+print((2 + 1));
+print((a));
+
+print(2 + 1);
+print(a && b);
+
+print(a, 32, 32., "banana");
+
+// print(getYear()); ERRO: print de func
