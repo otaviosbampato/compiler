@@ -1,13 +1,17 @@
-int a = 2 * 5;
-int b;
-2 + 2;
-b = a ------1;
-c = a -------1;
-int x, y = 0, z;
-x = z = -1;
-{
+int main(){
+
+  int a = 2 * 5;
+  int b;
+  2 + 2;
+  b = a ------1;
+  c = a -------1;
+  int x, y = 0, z;
+  x = z = -1;
   {
-    idade = 33;
-    idade = idade - 3 * 2;
+    {
+      idade = 33;
+      idade = idade - 3 * 2;
+    }
   }
+
 }

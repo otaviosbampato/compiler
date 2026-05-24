@@ -1,22 +1,24 @@
-print(a);
+int main(){
+    print(a);
 
-// print(); ERRO: print sem arg
+    // print(); ERRO: print sem arg
 
-print("banana");
-print("banana", "Ele me disse \n");
-print("\t Meu nome eh \"João\"");
-print(32.);
-print(32);
+    print("banana");
+    print("banana", "Ele me disse \n");
+    print("\t Meu nome eh \"João\"");
+    print(32.);
+    print(32);
 
-print((2 + 1));
-print((a));
+    print((2 + 1));
+    print((a));
 
-print(2 + 1);
-print(a && b);
+    print(2 + 1);
+    print(a && b);
 
-print(a, 32, 32., "banana");
+    print(a, 32, 32., "banana");
 
-// print(getYear()); ERRO: print de func
+    // print(getYear()); ERRO: print de func
 
-read(a, b, c, d);
-read(x);
+    read(a, b, c, d);
+    read(x);
+}
