@@ -7,6 +7,7 @@
 #include <string.h>
 #include "parser.h"
 
+extern int yylval;
 int column_number = 1;
 
 #define TYPE_INT 1
@@ -41,7 +42,16 @@ void printLexeme(char *lexeme, char *tokenClass){
 
 int symbol_count = 1;
 
-/* Symbol table - declarada e gerenciada aqui no lexer */
+/* Estrutura do símbolo */
+typedef struct simbolo {
+    int pos;
+    char *lexeme;           // lexeme string
+    char *tokenClass;        // token class (identifier)
+    int line;              // lexeme line
+    int column;             // lexeme column
+    struct simbolo *next;   // para colisões da hash (linked list)
+} Symbol;
+
 Symbol* table[TABLE_SIZE] = {NULL};
 
 /* Função hash */
@@ -75,7 +85,6 @@ void insertTable(const char* lexeme, const char* tokenClass, int line, int colum
     newSymbol->tokenClass = strdup(tokenClass);
     newSymbol->line = line;
     newSymbol->column = column;
-    newSymbol->value = 0.0;
     newSymbol->next = table[h];
     table[h] = newSymbol;
 }
@@ -121,19 +130,19 @@ read    { printLexeme(yytext, "READ"); incrementColumnCounter(yyleng); return RE
 /* −−−−−−−−−−−−−−−−−−−−−−−−−−−−− Type Definitions −−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
 %}
 
-int    { yylval.num = TYPE_INT; printLexeme(yytext, "TYPE (TYPE_INT)"); incrementColumnCounter(yyleng); return TYPE; }
-float  { yylval.num = TYPE_FLOAT; printLexeme(yytext, "TYPE (TYPE_FLOAT)"); incrementColumnCounter(yyleng); return TYPE; }
+int    { yylval = TYPE_INT; printLexeme(yytext, "TYPE (TYPE_INT)"); incrementColumnCounter(yyleng); return TYPE; }
+float  { yylval = TYPE_FLOAT; printLexeme(yytext, "TYPE (TYPE_FLOAT)"); incrementColumnCounter(yyleng); return TYPE; }
 
 %{
 /* −−−−−−−−−−−−−−−−−−−−−−−−−−−−− Relational Operators −−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
 %}
 
-"<="    { yylval.num = RELOP_LE; printLexeme(yytext, "RELOP (RELOP_LE)"); incrementColumnCounter(yyleng); return RELOP; }
-">=" { yylval.num = RELOP_GE; printLexeme(yytext, "RELOP (RELOP_GE)"); incrementColumnCounter(yyleng); return RELOP; }
-"!="    { yylval.num = EQOP_NE; printLexeme(yytext, "EQOP (EQOP_NE)"); incrementColumnCounter(yyleng); return EQOP; }
-"==" { yylval.num = EQOP_EQ; printLexeme(yytext, "EQOP (EQOP_EQ)"); incrementColumnCounter(yyleng); return EQOP; }
-"<"     { yylval.num = RELOP_LT; printLexeme(yytext, "RELOP (RELOP_LT)"); incrementColumnCounter(yyleng); return RELOP; }
-">"     { yylval.num = RELOP_GT; printLexeme(yytext, "RELOP (RELOP_GT)"); incrementColumnCounter(yyleng); return RELOP; }
+"<="    { yylval = RELOP_LE; printLexeme(yytext, "RELOP (RELOP_LE)"); incrementColumnCounter(yyleng); return RELOP; }
+">="    { yylval = RELOP_GE; printLexeme(yytext, "RELOP (RELOP_GE)"); incrementColumnCounter(yyleng); return RELOP; }
+"!="    { yylval = EQOP_NE; printLexeme(yytext, "EQOP (EQOP_NE)"); incrementColumnCounter(yyleng); return EQOP; }
+"=="    { yylval = EQOP_EQ; printLexeme(yytext, "EQOP (EQOP_EQ)"); incrementColumnCounter(yyleng); return EQOP; }
+"<"     { yylval = RELOP_LT; printLexeme(yytext, "RELOP (RELOP_LT)"); incrementColumnCounter(yyleng); return RELOP; }
+">"     { yylval = RELOP_GT; printLexeme(yytext, "RELOP (RELOP_GT)"); incrementColumnCounter(yyleng); return RELOP; }
 
 %{
 /* −−−−−−−−−−−−−−−−−−−−−−−−−−−−− Assignment Operators −−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
@@ -174,11 +183,11 @@ float  { yylval.num = TYPE_FLOAT; printLexeme(yytext, "TYPE (TYPE_FLOAT)"); incr
 /* −−−−−−−−−−−−−−−−−−−−−−−−−−−−− Identifiers and Literal Numbers −−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
 %}
 
-{identifier} { yylval.str = strdup(yytext); insertTable(yytext, "ID", yylineno, column_number); printLexeme(yytext, "ID"); incrementColumnCounter(yyleng); return ID; }
+{identifier} { insertTable(yytext, "ID", yylineno, column_number); printLexeme(yytext, "ID"); incrementColumnCounter(yyleng); return ID; }
 
-{float} { yylval.num = atof(yytext); printLexeme(yytext, "FLOAT_LITERAL"); incrementColumnCounter(yyleng); return FLOAT_LITERAL; }
+{float}   { printLexeme(yytext, "FLOAT_LITERAL"); incrementColumnCounter(yyleng); return FLOAT_LITERAL; }
 
-{integer} { yylval.num = atoi(yytext); printLexeme(yytext, "INTEGER_LITERAL"); incrementColumnCounter(yyleng); return INTEGER_LITERAL; }
+{integer} { printLexeme(yytext, "INTEGER_LITERAL"); incrementColumnCounter(yyleng); return INTEGER_LITERAL; }
 
 %{
 /* −−−−−−−−−−−−−−−−−−−−−−−−−−−−− Errors −−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
@@ -190,11 +199,11 @@ float  { yylval.num = TYPE_FLOAT; printLexeme(yytext, "TYPE (TYPE_FLOAT)"); incr
 
 void printSymbolTable() {
     printf("\n--- TABELA DE SÍMBOLOS ---\n");
-    printf("\nPos.  Token         Lexema           Valor\n");
-    printf("---------------------------------------------\n");
+    printf("\nPos.  Token         Lexema\n");
+    printf("----------------------------\n");
     for (int i = 0; i < TABLE_SIZE; i++) {
         for (Symbol* s = table[i]; s != NULL; s = s->next) {
-            printf("%-5d %-13s %-16s %g\n", s->pos, s->tokenClass, s->lexeme, s->value);
+            printf("%-5d %-13s %s\n", s->pos, s->tokenClass, s->lexeme);
         }
     }
 }
