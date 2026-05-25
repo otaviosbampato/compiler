@@ -225,7 +225,8 @@ expr
 void yyerror(const char *s) {
     extern int yylineno;
     extern int column_number;
-    fprintf(stderr, "Error at line %d, column %d: %s\n", yylineno, column_number, s);
+    extern int yyleng;
+    fprintf(stderr, "Error at line %d, column %d: %s\n", yylineno, column_number - yyleng, s);
 }
 
 extern void printSymbolTable(); // func do lexer pra printar a tabela
