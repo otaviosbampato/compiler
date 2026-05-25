@@ -56,13 +56,14 @@ void yyerror(const char *s);
 %left RELOP
 %left PLUS MINUS
 %left MULT DIV
+%right POW
 %precedence NOT
 %precedence UMINUS
 
 %%
 
 program
-  : global_decl_list { printf("Aceita \n"); }
+  : global_decl_list
   ;
 
 global_decl_list
@@ -210,6 +211,7 @@ expr
 
   | expr MULT expr 
   | expr DIV expr 
+  | expr POW expr
 
   | MINUS expr %prec UMINUS 
   | NOT expr %prec NOT 
@@ -236,7 +238,9 @@ int main(int argc, char **argv) {
         }
     }
     // roda o parsing, que por sua vez roda o lex
-    yyparse();
+    if (yyparse() == 0) {
+        printf("Aceita\n");
+    }
 
     if (symbol_count > 1) {
         printSymbolTable();
