@@ -231,6 +231,7 @@ void yyerror(const char *s) {
 
 extern void printSymbolTable(); // func do lexer pra printar a tabela
 extern int symbol_count;
+extern int lexical_error_count;
 
 int main(int argc, char **argv) {
     extern FILE *yyin;
@@ -242,13 +243,15 @@ int main(int argc, char **argv) {
         }
     }
     // roda o parsing, que por sua vez roda o lex
-    if (yyparse() == 0) {
-        printf("Aceita\n");
+    int has_errors = (yyparse() != 0) || (lexical_error_count > 0);
+
+    if (!has_errors) {
+      printf("Aceita\n");
     }
 
     if (symbol_count > 1) {
-        printSymbolTable();
+      printSymbolTable();
     }
 
-    return 0;
+    return has_errors ? 1 : 0;
 }

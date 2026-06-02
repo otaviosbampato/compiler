@@ -45,6 +45,7 @@ void printLexeme(char *lexeme, char *tokenClass){
 #define TABLE_SIZE 211  // tamanho da hash (número primo aumenta dispersão)
 
 int symbol_count = 1;
+int lexical_error_count = 0;
 
 /* Estrutura do símbolo */
 typedef struct simbolo {
@@ -206,7 +207,11 @@ string  { yylval = TYPE_STR; printLexeme(yytext, "TYPE (TYPE_STR)"); incrementCo
 /* −−−−−−−−−−−−−−−−−−−−−−−−−−−−− Errors −−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
 %}
 
-. { printLexeme(yytext, "LEXICAL_ERROR"); incrementColumnCounter(yyleng); }
+. {
+    lexical_error_count++;
+    printLexeme(yytext, "LEXICAL_ERROR");
+    incrementColumnCounter(yyleng);
+}
 
 %%
 
