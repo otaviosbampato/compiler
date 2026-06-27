@@ -7,7 +7,7 @@
 #include <string.h>
 #include "parser.h"
 
-extern int yylval;
+// yylval é sendo importado pelo parser agora.
 int column_number = 1;
 
 #define TYPE_INT 1
@@ -97,12 +97,12 @@ string  { yylval.ival = TYPE_STR; printLexeme(yytext, "TYPE (TYPE_STR)"); increm
 /* −−−−−−−−−−−−−−−−−−−−−−−−−−−−− Relational Operators −−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
 %}
 
-"<="    { yylval = RELOP_LE; printLexeme(yytext, "RELOP (RELOP_LE)"); incrementColumnCounter(yyleng); return RELOP; }
-">="    { yylval = RELOP_GE; printLexeme(yytext, "RELOP (RELOP_GE)"); incrementColumnCounter(yyleng); return RELOP; }
-"!="    { yylval = EQOP_NE; printLexeme(yytext, "EQOP (EQOP_NE)"); incrementColumnCounter(yyleng); return EQOP; }
-"=="    { yylval = EQOP_EQ; printLexeme(yytext, "EQOP (EQOP_EQ)"); incrementColumnCounter(yyleng); return EQOP; }
-"<"     { yylval = RELOP_LT; printLexeme(yytext, "RELOP (RELOP_LT)"); incrementColumnCounter(yyleng); return RELOP; }
-">"     { yylval = RELOP_GT; printLexeme(yytext, "RELOP (RELOP_GT)"); incrementColumnCounter(yyleng); return RELOP; }
+"<="    { yylval.ival = RELOP_LE; printLexeme(yytext, "RELOP (RELOP_LE)"); incrementColumnCounter(yyleng); return RELOP; }
+">="    { yylval.ival = RELOP_GE; printLexeme(yytext, "RELOP (RELOP_GE)"); incrementColumnCounter(yyleng); return RELOP; }
+"!="    { yylval.ival = EQOP_NE; printLexeme(yytext, "EQOP (EQOP_NE)"); incrementColumnCounter(yyleng); return EQOP; }
+"=="    { yylval.ival = EQOP_EQ; printLexeme(yytext, "EQOP (EQOP_EQ)"); incrementColumnCounter(yyleng); return EQOP; }
+"<"     { yylval.ival = RELOP_LT; printLexeme(yytext, "RELOP (RELOP_LT)"); incrementColumnCounter(yyleng); return RELOP; }
+">"     { yylval.ival = RELOP_GT; printLexeme(yytext, "RELOP (RELOP_GT)"); incrementColumnCounter(yyleng); return RELOP; }
 
 %{
 /* −−−−−−−−−−−−−−−−−−−−−−−−−−−−− Assignment Operators −−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
