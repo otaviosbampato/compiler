@@ -81,7 +81,7 @@ void yyerror(const char *s);
 %%
 
 program
-  : global_decl_list
+  : { sym_init(); } global_decl_list
   ;
 
 global_decl_list
@@ -310,7 +310,7 @@ void yyerror(const char *s) {
 extern int lexical_error_count;
 
 int main(int argc, char **argv) {
-  sym_init();
+  
   extern FILE *yyin;
   if (argc > 1) {
       yyin = fopen(argv[1], "r");
