@@ -113,8 +113,11 @@ opt_param_list
   ;
 
 param_list
-  : param_list PUNCT_COMMA TYPE ID { sym_declare($4.sval, current_decl_type, SYM_PARAM, yylineno, column_number); }
-  | TYPE ID { sym_declare($2.sval, current_decl_type, SYM_PARAM, yylineno, column_number); }
+  : param_list PUNCT_COMMA 
+    TYPE { current_decl_type = $3.ival; } 
+    ID { sym_declare($4.sval, current_decl_type, SYM_PARAM, yylineno, column_number); }
+  | TYPE { current_decl_type = $1.ival; } 
+    ID { sym_declare($2.sval, current_decl_type, SYM_PARAM, yylineno, column_number); }
   ;
 
 func_call
