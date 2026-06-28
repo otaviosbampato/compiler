@@ -27,6 +27,10 @@
 #define SYM_FUNC  1   /* função */
 #define SYM_PARAM 2   /* parâmetro formal */
 
+// Type Widths (Bytes)
+#define INT_WIDTH    4
+#define FLOAT_WIDTH  8
+
 // * listinha encadeada
 typedef struct Symbol {
     char        *name;          /* lexema do identificador          */

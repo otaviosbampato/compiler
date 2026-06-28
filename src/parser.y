@@ -6,8 +6,13 @@
 
 int yylex(void);
 
-/* variável global para carregar o tipo corrente durante declarações */
+/* −−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−− Variáveis Globais −−−−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
+
+/* tipo corrente durante declarações */
 static int current_decl_type = 0;
+
+/* offset */
+static int offset = 0;
 
 void yyerror(const char *s);
 int tipos_compativeis(int, int);
