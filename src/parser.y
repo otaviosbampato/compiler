@@ -21,10 +21,16 @@ void yyerror(const char *s);
         int tipo; /* tipo semântico do resultado (SYM_TYPE_*)*/
         char* code // codigo de fato da expr  
     } expr;
+    struct {
+        int tipo; /* tipo semântico do resultado (SYM_TYPE_*)*/
+        char* name // lexema do id para depuração  
+    } use_id;
 }
 
 // * definimos os valores de %union usados por essas expressões
 %type <expr> expr primary_expr literal
+
+%type <use_id> use_id func_call
 
 /* −−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−− Lexer Tokens −−−−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
 %define parse.error verbose
@@ -121,7 +127,12 @@ param_list
   ;
 
 func_call
-  : ID PUNCT_OPEN_PAREN opt_func_call_list PUNCT_CLOSE_PAREN
+  : use_id
+  {
+    $$.tipo = $1.tipo;
+    $$.name = $1.name;
+  } 
+  PUNCT_OPEN_PAREN opt_func_call_list PUNCT_CLOSE_PAREN
   ;
 
 opt_func_call_list
@@ -226,22 +237,12 @@ read_stmt
   ;
 
 read_list
-  : read_list PUNCT_COMMA ID
-  | ID
+  : read_list PUNCT_COMMA use_id
+  | use_id
   ;
 
 primary_expr
-  : ID
-    {
-      Symbol *s = sym_lookup($1.sval);
-      if (!s) {
-          fprintf(stderr, "Erro semântico linha %d: '%s' não declarado\n",
-                  yylineno, $1.sval);
-          $$.tipo = SYM_TYPE_INT;  //* tipo de recuperação para não propagar erro
-      } else {
-          $$.tipo = s->type;
-      }
-    }
+  : use_id { $$.tipo = $1.tipo; }
   | literal
   | PUNCT_OPEN_PAREN expr PUNCT_CLOSE_PAREN
   | func_call
@@ -255,28 +256,22 @@ literal
   ;
 
 expr
-  : ID ASSIGN expr
+  : use_id ASSIGN expr
     {
-        Symbol *s = sym_lookup($1.sval);
-        if (!s) {
-            fprintf(stderr, "Erro semântico linha %d: '%s' não declarado\n",
-                    yylineno, $1.sval);
-            $$.tipo = SYM_TYPE_INT;
-        } else {
-            // * verificação de tipo
-            int compativel =
-                (s->type == $3.expr.tipo) ||
-                (s->type == SYM_TYPE_INT && $3.expr.tipo == SYM_TYPE_FLOAT) ||
-                (s->type == SYM_TYPE_FLOAT && $3.expr.tipo == SYM_TYPE_INT);
-            if (!compativel) {
-                fprintf(stderr,
-                "Erro semântico linha %d: tipo incompatível na atribuição de '%s' "
-                "(esperado '%s', recebeu '%s')\n",
-                yylineno, s->name,
-                sym_type_str(s->type), sym_type_str($3.expr.tipo));
-            }
-            $$.tipo = s->type;
-        }
+      // * verificação de tipo
+      int compativel =
+          ($1.tipo == $3.expr.tipo) ||
+          ($1.tipo == SYM_TYPE_INT && $3.expr.tipo == SYM_TYPE_FLOAT) ||
+          ($1.tipo == SYM_TYPE_FLOAT && $3.expr.tipo == SYM_TYPE_INT);
+      if (!compativel) {
+          fprintf(stderr,
+          "Erro semântico linha %d: tipo incompatível na atribuição de '%s' "
+          "(esperado '%s', recebeu '%s')\n",
+          yylineno, $1.name,
+          sym_type_str($1.tipo), sym_type_str($3.expr.tipo));
+      }
+      $$.tipo = $1.tipo;
+        
     }
   
   | expr OR expr
@@ -296,6 +291,21 @@ expr
   | NOT expr %prec NOT 
 
   | primary_expr
+  ;
+
+  use_id
+  : ID {
+    Symbol *s = sym_lookup($1.sval);
+      if (!s) {
+          fprintf(stderr, "Erro semântico linha %d: '%s' não declarado\n",
+                  yylineno, $1.sval);
+          $$.tipo = SYM_TYPE_INT;  //* tipo de recuperação para não propagar erro
+          $$.name = $1.sval;
+      } else {
+          $$.tipo = s->type;
+          $$.name = s->name;
+      }
+  }
   ;
 
 %%
