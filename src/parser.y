@@ -5,15 +5,14 @@
 #include "symtable.h"
 
 int yylex(void);
-/* variável para carregar o tipo corrente durante declarações */
+
+/* variável global para carregar o tipo corrente durante declarações */
 static int current_decl_type = 0;
 
 void yyerror(const char *s);
 int tipos_compativeis(int, int);
 
 %}
-
-// !! REMOVER TIPOS BOOLEAN E STRING (TIROU PONTO DA ÚLTIMA)
 
 %union {
     int   ival;   /* valor inteiro: TYPE_INT, RELOP_LE, etc. */
@@ -67,8 +66,6 @@ int tipos_compativeis(int, int);
 %token PUNCT_CLOSE_BRACE
 
 %token <sval> ID
-%token <sval> STR_LITERAL
-%token <ival> BOOL_LITERAL
 %token INTEGER_LITERAL
 %token FLOAT_LITERAL
 
@@ -249,8 +246,6 @@ primary_expr
 literal
   : INTEGER_LITERAL { $$.tipo = SYM_TYPE_INT;   }
   | FLOAT_LITERAL   { $$.tipo = SYM_TYPE_FLOAT; }
-  | STR_LITERAL     { $$.tipo = SYM_TYPE_STR;   }
-  | BOOL_LITERAL    { $$.tipo = SYM_TYPE_BOOL;  }
   ;
 
 expr

@@ -12,9 +12,6 @@ int column_number = 1;
 
 #define TYPE_INT 1
 #define TYPE_FLOAT 2
-#define TYPE_BOOL 3
-#define BOOL_LITERAL_TRUE 1
-#define BOOL_LITERAL_FALSE 2
 #define EQOP_NE 1
 #define EQOP_EQ 2
 #define RELOP_LE 1
@@ -79,16 +76,12 @@ print   { printLexeme(yytext, "PRINT"); incrementColumnCounter(yyleng); return P
 read    { printLexeme(yytext, "READ"); incrementColumnCounter(yyleng); return READ; }
 return  { printLexeme(yytext, "RETURN"); incrementColumnCounter(yyleng); return RETURN; }
 
-true    { yylval.ival = BOOL_LITERAL_TRUE; printLexeme(yytext, "BOOL_LITERAL (BOOL_LITERAL_TRUE)"); incrementColumnCounter(yyleng); return BOOL_LITERAL; }
-false   { yylval.ival = BOOL_LITERAL_FALSE; printLexeme(yytext, "BOOL_LITERAL (BOOL_LITERAL_FALSE)"); incrementColumnCounter(yyleng); return BOOL_LITERAL; }
-
 %{
 /* −−−−−−−−−−−−−−−−−−−−−−−−−−−−− Type Definitions −−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
 %}
 
 int     { yylval.ival = TYPE_INT; printLexeme(yytext, "TYPE (TYPE_INT)"); incrementColumnCounter(yyleng); return TYPE; }
 float   { yylval.ival = TYPE_FLOAT; printLexeme(yytext, "TYPE (TYPE_FLOAT)"); incrementColumnCounter(yyleng); return TYPE; }
-boolean { yylval.ival = TYPE_BOOL; printLexeme(yytext, "TYPE (TYPE_BOOL)"); incrementColumnCounter(yyleng); return TYPE; }
 
 %{
 /* −−−−−−−−−−−−−−−−−−−−−−−−−−−−− Relational Operators −−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
