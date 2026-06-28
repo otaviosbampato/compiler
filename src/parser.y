@@ -20,13 +20,13 @@ void yyerror(const char *s);
     int   ival;   /* valor inteiro: TYPE_INT, RELOP_LE, etc. */
     char *sval;       /* lexema de um identificador              */
     struct {
-        int tipo;     /* tipo semântico do resultado (SYM_TYPE_*)*/
+        int tipo; /* tipo semântico do resultado (SYM_TYPE_*)*/
+        char* code // codigo de fato da expr  
     } expr;
 }
 
-// ? que porra é essa aqui?
-/* associar o tipo semântico a cada não-terminal de expressão */
-%type <expr> expr primary_expr
+// * definimos os valores de %union usados por essas expressões
+%type <expr> expr primary_expr literal
 
 /* −−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−− Lexer Tokens −−−−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
 %define parse.error verbose
@@ -38,9 +38,7 @@ void yyerror(const char *s);
 %token READ
 %token RETURN
 
-%token TYPE
-
-// TODO: conferir se falta passar <ival> pra algum token
+%token <ival> TYPE
 
 %token <ival> RELOP
 %token <ival> EQOP
@@ -64,10 +62,10 @@ void yyerror(const char *s);
 %token PUNCT_CLOSE_BRACE
 
 %token <sval> ID
-%token INTEGER_LITERAL
-%token FLOAT_LITERAL
 %token <sval> STR_LITERAL
 %token <ival> BOOL_LITERAL
+%token INTEGER_LITERAL
+%token FLOAT_LITERAL
 
 /* −−−−−−−−−−−−−−−−−−−−−−−−−−−−− Definição de Precedência −−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
 
@@ -101,8 +99,9 @@ global_decl
 func_decl
   : TYPE ID PUNCT_OPEN_PAREN 
     {
+      // atualiza o tipo
+      current_decl_type = $1.ival
       // * registra a função no escopo global antes de abrir o escopo dela
-      // ? pq $2? quando usar $2, $1 ou $3?
       // ? onde a gente atualiza current_decl_type? oq isso significa?
       sym_declare($2.sval, current_decl_type, SYM_FUNC,
                   yylineno, column_number);
@@ -164,7 +163,8 @@ block
   ;
 
 var_decl
-  : TYPE {current_decl_type = $1;} id_list PUNCT_SEMICOLON
+  : TYPE id_list PUNCT_SEMICOLON
+    {current_decl_type = $1.ival;}
   ;
 
 id_list
@@ -172,24 +172,22 @@ id_list
   | id_decl
   ;
 
-  // int TESTE;
-  // * int a = 5.0; -> float a = 5.0;
-  // * float a = 5; -> float a = 5.0; 
-  // ! conferir se tá certo
 id_decl
-  : ID {sym_declare($1.sval, current_decl_type, SYM_VAR, yyline, column_number);}
+  : ID {sym_declare($1.sval, current_decl_type, SYM_VAR, yylineno, column_number);}
   | ID ASSIGN expr 
     {Symbol *s = sym_declare($1.sval, current_decl_type, SYM_VAR, yylineno, column_number);
-      if(s && s->type != $3.expr.tipo) {
-        if !((s->type == SYM_TYPE_INT && $3.expr.tipo == SYM_TYPE_FLOAT) || (s->type == SYM_TYPE_FLOAT && $3.expr.tipo == SYM_TYPE_INT)){
+      int compativel =
+                (s->type == $3.expr.tipo) ||
+                (s->type == SYM_TYPE_INT   && $3.expr.tipo == SYM_TYPE_FLOAT) ||
+                (s->type == SYM_TYPE_FLOAT && $3.expr.tipo == SYM_TYPE_INT);
+      if(!compativel){
           fprintf(stderr,
                 "Erro semântico linha %d: tipo incompatível na inicialização de '%s' "
                 "(esperado '%s', recebeu '%s')\n",
                 yylineno, s->name,
-                sym_type_str(tipo_var), sym_type_str(tipo_expr));
-        }    
+                sym_type_str(s->type), sym_type_str($3.expr.tipo));
+        }
       }
-    }
   ;
 
 assign_stmt
@@ -228,24 +226,54 @@ read_list
   | ID
   ;
 
-  // ! fazer!
 primary_expr
-  : ID {sym_lookup();} // ! CORRIGIR parâmetros e como pegar
+  : ID
+    {
+      Symbol *s = sym_lookup($1.sval);
+      if (!s) {
+          fprintf(stderr, "Erro semântico linha %d: '%s' não declarado\n",
+                  yylineno, $1.sval);
+          $$.tipo = SYM_TYPE_INT;  //* tipo de recuperação para não propagar erro
+      } else {
+          $$.tipo = s->type;
+      }
+    }
   | literal
   | PUNCT_OPEN_PAREN expr PUNCT_CLOSE_PAREN
   | func_call
   ;
 
 literal
-  : INTEGER_LITERAL
-  | FLOAT_LITERAL
-  | STR_LITERAL
-  | BOOL_LITERAL
+  : INTEGER_LITERAL { $$.tipo = SYM_TYPE_INT;   }
+  | FLOAT_LITERAL   { $$.tipo = SYM_TYPE_FLOAT; }
+  | STR_LITERAL     { $$.tipo = SYM_TYPE_STR;   }
+  | BOOL_LITERAL    { $$.tipo = SYM_TYPE_BOOL;  }
   ;
 
-  // ! conferir se precisa tratar
 expr
   : ID ASSIGN expr
+    {
+        Symbol *s = sym_lookup($1.sval);
+        if (!s) {
+            fprintf(stderr, "Erro semântico linha %d: '%s' não declarado\n",
+                    yylineno, $1.sval);
+            $$.tipo = SYM_TYPE_INT;
+        } else {
+            // * verificação de tipo
+            int compativel =
+                (s->type == $3.expr.tipo) ||
+                (s->type == SYM_TYPE_INT && $3.expr.tipo == SYM_TYPE_FLOAT) ||
+                (s->type == SYM_TYPE_FLOAT && $3.expr.tipo == SYM_TYPE_INT);
+            if (!compativel) {
+                fprintf(stderr,
+                "Erro semântico linha %d: tipo incompatível na atribuição de '%s' "
+                "(esperado '%s', recebeu '%s')\n",
+                yylineno, s->name,
+                sym_type_str(s->type), sym_type_str($3.expr.tipo));
+            }
+            $$.tipo = s->type;
+        }
+    }
   
   | expr OR expr
   | expr AND expr
@@ -278,24 +306,24 @@ void yyerror(const char *s) {
 extern int lexical_error_count;
 
 int main(int argc, char **argv) {
-    extern FILE *yyin;
-    if (argc > 1) {
-        yyin = fopen(argv[1], "r");
-        if (!yyin) {
-            perror("Error opening file");
-            return 1;
-        }
-    }
+  sym_init();
+  extern FILE *yyin;
+  if (argc > 1) {
+      yyin = fopen(argv[1], "r");
+      if (!yyin) {
+          perror("Error opening file");
+          return 1;
+      }
+  }
 
-    sym_init();
-    // roda o parsing, que por sua vez roda o lex
-    int has_errors = (yyparse() != 0) || (lexical_error_count > 0);
+  // roda o parsing, que por sua vez roda o lex
+  int has_errors = (yyparse() != 0) || (lexical_error_count > 0);
 
-    if (!has_errors) {
-      printf("Aceita\n");
-    }
+  if (!has_errors) {
+    printf("Aceita\n");
+  }
 
-    sym_print();
+  sym_print();
 
-    return has_errors ? 1 : 0;
+  return has_errors ? 1 : 0;
 }
