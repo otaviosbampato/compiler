@@ -9,7 +9,7 @@
 
 // yylval é sendo importado pelo parser agora.
 int column_number = 1;
-// comentario de teste
+// comentário de teste
 #define TYPE_INT 1
 #define TYPE_FLOAT 2
 #define TYPE_BOOL 3
