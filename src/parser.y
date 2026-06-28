@@ -30,7 +30,7 @@ void yyerror(const char *s);
 // * definimos os valores de %union usados por essas expressões
 %type <expr> expr primary_expr literal
 
-%type <use_id> use_id func_call
+%type <use_id> use_id func_call decl_var_id decl_func_id decl_param_id
 
 /* −−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−− Lexer Tokens −−−−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
 %define parse.error verbose
@@ -101,16 +101,19 @@ global_decl
   ;
 
 func_decl
-  : TYPE    
-    ID PUNCT_OPEN_PAREN 
-    {
+  : TYPE {
       // atualiza o tipo
       current_decl_type = $1.ival;
-      // * registra a função no escopo global antes de abrir o escopo dela
-      sym_declare($2.sval, current_decl_type, SYM_FUNC,
-                  yylineno, column_number);
+    }
+    // * registra a função no escopo global antes de abrir o escopo dela
+    decl_func_id PUNCT_OPEN_PAREN 
+    {
       open_scope();   // * escopo dos parâmetros + corpo
-    } opt_param_list PUNCT_CLOSE_PAREN no_scope_block {close_scope();}
+    } 
+    opt_param_list PUNCT_CLOSE_PAREN no_scope_block 
+    {
+      close_scope();
+    }
   ;
 
 opt_param_list
@@ -120,10 +123,8 @@ opt_param_list
 
 param_list
   : param_list PUNCT_COMMA 
-    TYPE { current_decl_type = $3.ival; } 
-    ID { sym_declare($4.sval, current_decl_type, SYM_PARAM, yylineno, column_number); }
-  | TYPE { current_decl_type = $1.ival; } 
-    ID { sym_declare($2.sval, current_decl_type, SYM_PARAM, yylineno, column_number); }
+    TYPE { current_decl_type = $3.ival; } decl_param_id
+  | TYPE { current_decl_type = $1.ival; } decl_param_id
   ;
 
 func_call
@@ -188,21 +189,21 @@ id_list
   ;
 
 id_decl
-  : ID {sym_declare($1.sval, current_decl_type, SYM_VAR, yylineno, column_number);}
-  | ID ASSIGN expr 
-    {Symbol *s = sym_declare($1.sval, current_decl_type, SYM_VAR, yylineno, column_number);
+  : decl_var_id
+  | decl_var_id ASSIGN expr 
+    {
       int compativel =
-                (s->type == $3.expr.tipo) ||
-                (s->type == SYM_TYPE_INT   && $3.expr.tipo == SYM_TYPE_FLOAT) ||
-                (s->type == SYM_TYPE_FLOAT && $3.expr.tipo == SYM_TYPE_INT);
+                ($1.type == $3.expr.tipo) ||
+                ($1.type == SYM_TYPE_INT   && $3.expr.tipo == SYM_TYPE_FLOAT) ||
+                ($1.type == SYM_TYPE_FLOAT && $3.expr.tipo == SYM_TYPE_INT);
       if(!compativel){
           fprintf(stderr,
                 "Erro semântico linha %d: tipo incompatível na inicialização de '%s' "
                 "(esperado '%s', recebeu '%s')\n",
-                yylineno, s->name,
-                sym_type_str(s->type), sym_type_str($3.expr.tipo));
+                yylineno, $1.name,
+                sym_type_str($1.type), sym_type_str($3.expr.tipo));
         }
-      }
+    }
   ;
 
 assign_stmt
@@ -299,6 +300,45 @@ expr
       if (!s) {
           fprintf(stderr, "Erro semântico linha %d: '%s' não declarado\n",
                   yylineno, $1.sval);
+          $$.tipo = SYM_TYPE_INT;  //* tipo de recuperação para não propagar erro
+          $$.name = $1.sval;
+      } else {
+          $$.tipo = s->type;
+          $$.name = s->name;
+      }
+  }
+  ;
+
+  decl_var_id
+  : ID {
+    Symbol *s = sym_declare($1.sval, current_decl_type, SYM_VAR, yylineno, column_number);
+      if (!s) {
+          $$.tipo = SYM_TYPE_INT;  //* tipo de recuperação para não propagar erro
+          $$.name = $1.sval;
+      } else {
+          $$.tipo = s->type;
+          $$.name = s->name;
+      }
+  }
+  ;
+
+  decl_func_id
+  : ID {
+    Symbol *s = sym_declare($1.sval, current_decl_type, SYM_FUNC, yylineno, column_number);
+      if (!s) {
+          $$.tipo = SYM_TYPE_INT;  //* tipo de recuperação para não propagar erro
+          $$.name = $1.sval;
+      } else {
+          $$.tipo = s->type;
+          $$.name = s->name;
+      }
+  }
+  ;
+
+  decl_param_id
+  : ID {
+    Symbol *s = sym_declare($1.sval, current_decl_type, SYM_PARAM, yylineno, column_number);
+      if (!s) {
           $$.tipo = SYM_TYPE_INT;  //* tipo de recuperação para não propagar erro
           $$.name = $1.sval;
       } else {
