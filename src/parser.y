@@ -173,7 +173,7 @@ opt_expr
   ;
 
 block
-  : PUNCT_OPEN_BRACE {open_scope();} stmt_list PUNCT_CLOSE_BRACE {close_scope();}
+  : PUNCT_OPEN_BRACE { open_scope(); } stmt_list PUNCT_CLOSE_BRACE { close_scope(); }
   ;
 
 no_scope_block
@@ -241,9 +241,9 @@ read_list
 
 primary_expr
   : use_id { $$.tipo = $1.tipo; }
-  | literal
-  | PUNCT_OPEN_PAREN expr PUNCT_CLOSE_PAREN
-  | func_call
+  | literal { $$.tipo = $1.tipo; }
+  | PUNCT_OPEN_PAREN expr PUNCT_CLOSE_PAREN { $$.tipo = $2.tipo; }
+  | func_call { $$.tipo = $1.tipo; }
   ;
 
 literal
