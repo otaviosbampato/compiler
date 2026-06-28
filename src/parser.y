@@ -104,7 +104,7 @@ func_decl
       sym_declare($2.sval, current_decl_type, SYM_FUNC,
                   yylineno, column_number);
       open_scope();   // * escopo dos parâmetros + corpo
-    } opt_param_list PUNCT_CLOSE_PAREN block {close_scope();}
+    } opt_param_list PUNCT_CLOSE_PAREN no_scope_block {close_scope();}
   ;
 
 opt_param_list
@@ -158,6 +158,10 @@ opt_expr
 
 block
   : PUNCT_OPEN_BRACE {open_scope();} stmt_list PUNCT_CLOSE_BRACE {close_scope();}
+  ;
+
+no_scope_block
+  : PUNCT_OPEN_BRACE stmt_list PUNCT_CLOSE_BRACE
   ;
 
 var_decl
