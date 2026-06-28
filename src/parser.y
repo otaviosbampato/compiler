@@ -97,10 +97,11 @@ global_decl
   ;
 
 func_decl
-  : TYPE ID PUNCT_OPEN_PAREN 
+  : TYPE    
+    ID PUNCT_OPEN_PAREN 
     {
       // atualiza o tipo
-      current_decl_type = $1.ival
+      current_decl_type = $1.ival;
       // * registra a função no escopo global antes de abrir o escopo dela
       // ? onde a gente atualiza current_decl_type? oq isso significa?
       sym_declare($2.sval, current_decl_type, SYM_FUNC,
@@ -115,8 +116,8 @@ opt_param_list
   ;
 
 param_list
-  : param_list PUNCT_COMMA TYPE ID
-  | TYPE ID
+  : param_list PUNCT_COMMA TYPE ID { sym_declare($4.sval, current_decl_type, SYM_PARAM, yylineno, column_number); }
+  | TYPE ID { sym_declare($2.sval, current_decl_type, SYM_PARAM, yylineno, column_number); }
   ;
 
 func_call
@@ -163,8 +164,7 @@ block
   ;
 
 var_decl
-  : TYPE id_list PUNCT_SEMICOLON
-    {current_decl_type = $1.ival;}
+  : TYPE {current_decl_type = $1.ival;} id_list PUNCT_SEMICOLON
   ;
 
 id_list
