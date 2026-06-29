@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include "tac.h"
+#include "tac-generator.h"
 
 void generate(char *operator, char *argument1, char *argument2, char *result) {
     printf("%s, %s, %s, %s\n",
