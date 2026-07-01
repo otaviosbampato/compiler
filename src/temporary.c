@@ -7,7 +7,7 @@
 static unsigned long temporary_counter = 0;
 
 Temporary *temporary_new(void) {
-    Temporary *temporary = (Temporary *)malloc(sizeof(Temporary));
+    Temporary *temporary = (Temporary*)malloc(sizeof(Temporary));
     if (!temporary) {
         perror("temporary_new: malloc");
         exit(1);

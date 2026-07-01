@@ -89,20 +89,25 @@ int tipos_compativeis(int, int);
 
 %%
 
+// TO-DO: OK
 program
   : { sym_init(); } global_decl_list
   ;
 
+// TO-DO: OK
 global_decl_list
   : global_decl_list global_decl
   | %empty /* vazio */
   ;
 
+// TO-DO: OK
 global_decl
   : func_decl
   | var_decl
   ;
 
+
+// TO-DO: 
 func_decl
   : TYPE {
       // atualiza o tipo
