@@ -38,6 +38,18 @@ void printLexeme(char *lexeme, char *tokenClass){
 
 int lexical_error_count = 0;
 
+static char *copy_lexeme(const char *text) {
+    char *copy = malloc(strlen(text) + 1);
+
+    if (!copy) {
+        perror("malloc");
+        exit(1);
+    }
+
+    strcpy(copy, text);
+    return copy;
+}
+
 %}
 
 /* Regex Definitions  */
@@ -133,11 +145,11 @@ float   { yylval.ival = TYPE_FLOAT; printLexeme(yytext, "TYPE (TYPE_FLOAT)"); in
 /* −−−−−−−−−−−−−−−−−−−−−−−−−−−−− Identifiers and Literal Numbers −−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
 %}
 
-{identifier} { yylval.sval = strdup(yytext); printLexeme(yytext, "ID"); incrementColumnCounter(yyleng); return ID; }
+{identifier} { yylval.sval = copy_lexeme(yytext); printLexeme(yytext, "ID"); incrementColumnCounter(yyleng); return ID; }
 
-{float}   { printLexeme(yytext, "FLOAT_LITERAL"); incrementColumnCounter(yyleng); return FLOAT_LITERAL; }
+{float}   { yylval.sval = copy_lexeme(yytext); printLexeme(yytext, "FLOAT_LITERAL"); incrementColumnCounter(yyleng); return FLOAT_LITERAL; }
 
-{integer} { printLexeme(yytext, "INTEGER_LITERAL"); incrementColumnCounter(yyleng); return INTEGER_LITERAL; }
+{integer} { yylval.sval = copy_lexeme(yytext); printLexeme(yytext, "INTEGER_LITERAL"); incrementColumnCounter(yyleng); return INTEGER_LITERAL; }
 
 %{
 /* −−−−−−−−−−−−−−−−−−−−−−−−−−−−− Errors −−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
