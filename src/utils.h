@@ -10,5 +10,6 @@
 
 int max(int t1, int t2);
 char *widen(char *addr, int t1, int t2);
+void output_code(char *code);
 
 #endif

@@ -4,6 +4,7 @@
 
 #include "utils.h"
 
+#define output_file_path "output/output.txt"
 
 //retorna um valor inteiro representando a hierarquia de tipos
 static int type_rank(int type) {
@@ -94,4 +95,23 @@ char *widen(char *addr, int t1, int t2) {
     }
 
     return result;
+}
+
+void output_code(char *code) {
+    if (!code) {
+        fprintf(stderr, "Erro: código nulo em output_code\n");
+        return;
+    }
+    FILE *fptr;
+
+    fptr = fopen(output_file_path, "w");
+
+    if (fptr == NULL) {
+        printf("Error opening the file!\n");
+        return; 
+    }
+
+    fprintf(fptr, "%s", code);
+    fclose(fptr);
+    return;
 }

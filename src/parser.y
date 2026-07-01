@@ -120,7 +120,7 @@ static int has_text(const char *text);
 program
   : { sym_init(); } global_decl_list
     {
-      printf("%s", $2.code);
+      output_code($2.code);
       $$.code = $2.code;
     }
   ;
