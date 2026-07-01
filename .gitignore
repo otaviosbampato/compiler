@@ -7,3 +7,5 @@ main
 lexer.c
 parser.c
 parser_teste.y
+output/*
+!output/.gitkeep

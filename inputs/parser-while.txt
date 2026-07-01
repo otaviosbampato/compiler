@@ -11,8 +11,6 @@ int main() {
         }
     }
 
-    int soma(int a, int b){return a + b}
-
     while(2 + 2){
         int a = soma();
     }
@@ -20,3 +18,5 @@ int main() {
     while(!a){
     }
 }
+
+int soma(int a, int b){return a + b;}
