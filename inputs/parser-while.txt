@@ -16,6 +16,8 @@ float media(float a, float b) {
 
 int classifica(int x) {
     int resultado;
+    int resultado; // erro de redeclaração
+
     if (x > 0 && ~(x == 0)) {
         resultado = 1;
     } else {
@@ -36,6 +38,7 @@ int main() {
     b = 3;
     x = 2.5;
     y = 1.5;
+    w = 1; // erro esperado: w ainda foi declarado
 
     int fat;
     fat = fatorial(a);
@@ -51,6 +54,8 @@ int main() {
         int local;
         local = a * b;
     }
+
+    local = 75; // variável "local" não foi definido fora do while
 
     int pot;
     pot = a ** b;
