@@ -153,6 +153,7 @@ func_decl
       char *label = generate_label($2.name);
       char *body = join2(label, $7.code);
       $$.code = body;
+      sym_print_current_scope();
       close_scope();
     }
   ;
@@ -259,6 +260,7 @@ block
     }
     stmt_list PUNCT_CLOSE_BRACE
     {
+      sym_print_current_scope();
       close_scope();
       $$.code = $3.code;
     }
@@ -831,6 +833,5 @@ int main(int argc, char **argv) {
         printf("Aceita\n");
     }
 
-    sym_print();
     return has_errors ? 1 : 0;
 }

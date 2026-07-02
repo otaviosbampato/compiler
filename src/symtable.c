@@ -111,7 +111,7 @@ const char *sym_type_str(int type) {
 }
 
 // imprime a tabela de simbolo, e passa por todos os escopos (topo → global)
-void sym_print(void) {
+void sym_print_all(void) {
     printf("\n=== TABELA DE SÍMBOLOS (escopos) ===\n");
 
     if (!current_scope) {
@@ -139,4 +139,33 @@ void sym_print(void) {
         }
     }
     printf("\n");
+}
+
+// imprime uma tabela de símbolos do escopo atual
+void sym_print_current_scope() {
+    printf("\n=== TABELA DE SÍMBOLOS ===\n");
+
+    if (!current_scope) {
+        printf("  (vazia)\n");
+        return;
+    }
+
+    printf("\n  Escopo nível %d:\n", current_scope->level);
+    printf("  %-20s %-10s %-10s %s\n",
+            "Nome", "Tipo", "Categoria", "Linha");
+    printf("  %-20s %-10s %-10s %s\n",
+            "----", "----", "---------", "-----");
+
+    if (!current_scope->symbols) {
+        printf("  (sem símbolos)\n");
+        return;
+    }
+
+    for (Symbol *s = current_scope->symbols; s != NULL; s = s->next) {
+        const char *cat = (s->category == SYM_FUNC)  ? "função"    :
+                          (s->category == SYM_PARAM) ? "parâmetro" : "variável";
+        printf("  %-20s %-10s %-10s %d\n",
+                s->name, sym_type_str(s->type), cat, s->line);
+    }
+
 }

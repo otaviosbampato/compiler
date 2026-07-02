@@ -44,7 +44,9 @@ Symbol *sym_declare(const char *name, int type, int category, int line, int colu
 
 Symbol *sym_lookup(const char *name);
 
-void sym_print(void);
+void sym_print_all(void);
+
+void sym_print_current_scope(void);
 
 const char *sym_type_str(int type);
 
