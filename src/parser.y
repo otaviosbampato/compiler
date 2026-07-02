@@ -61,7 +61,7 @@ static int has_text(const char *text);
     } use_id;
 }
 
-%type <stmt> program global_decl_list global_decl func_decl func_scope func_type stmt_list stmt block no_scope_block
+%type <stmt> program global_decl_list global_decl func_decl func_scope set_type stmt_list stmt block no_scope_block
 %type <stmt> var_decl id_list id_decl opt_param_list param_list param_item print_stmt read_stmt return_stmt else_clause if_stmt while_stmt
 %type <expr> opt_expr
 %type <expr> expr primary_expr literal func_call
@@ -148,7 +148,7 @@ global_decl
   ;
 
 func_decl
-  : func_type decl_func_id PUNCT_OPEN_PAREN func_scope opt_param_list PUNCT_CLOSE_PAREN no_scope_block
+  : set_type decl_func_id PUNCT_OPEN_PAREN func_scope opt_param_list PUNCT_CLOSE_PAREN no_scope_block
     {
       char *label = generate_label($2.name);
       char *body = join2(label, $7.code);
@@ -157,7 +157,7 @@ func_decl
     }
   ;
 
-func_type
+set_type
   : TYPE
     {
       current_decl_type = $1;
@@ -272,9 +272,9 @@ no_scope_block
   ;
 
 var_decl
-  : TYPE { current_decl_type = $1; } id_list PUNCT_SEMICOLON
+  : set_type id_list PUNCT_SEMICOLON
     {
-      $$.code = $3.code;
+      $$.code = $2.code;
     }
   ;
 
