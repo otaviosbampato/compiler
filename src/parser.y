@@ -44,7 +44,7 @@ static int has_text(const char *text);
     char *sval;
     struct {
         int tipo;
-        char *place;
+        char *address;
         char *code;
     } expr;
     struct {
@@ -305,14 +305,14 @@ id_decl
         semantic_error_count++;
       }
 
-      $$.code = join2($3.code, generate("=", $3.place, NULL, $1.name));
+      $$.code = join2($3.code, generate("=", $3.address, NULL, $1.name));
     }
   ;
 
 return_stmt
   : RETURN opt_expr PUNCT_SEMICOLON
     {
-      $$.code = join2($2.code, generate_return($2.place));
+      $$.code = join2($2.code, generate_return($2.address));
     }
   ;
 
@@ -321,13 +321,13 @@ opt_expr
     {
       $$.code = $1.code;
       $$.tipo = $1.tipo;
-      $$.place = $1.place;
+      $$.address = $1.address;
     }
   | %empty
     {
       $$.code = dup_text("");
       $$.tipo = 0;
-      $$.place = dup_text("");
+      $$.address = dup_text("");
     }
   ;
 
@@ -346,7 +346,7 @@ if_stmt
       char *Lend = new_label_name();
       char *code = NULL;
 
-      code = join2($3.code, generate_if_goto($3.place, Ltrue));
+      code = join2($3.code, generate_if_goto($3.address, Ltrue));
       code = join2(code, generate_goto(has_text($6.code) ? Lfalse : Lend));
       code = join2(code, generate_label(Ltrue));
       code = join2(code, $5.code);
@@ -393,7 +393,7 @@ while_stmt
       char *code = NULL;
 
       code = join2(generate_label(Lbegin), $3.code);
-      code = join2(code, generate_if_goto($3.place, Lbody));
+      code = join2(code, generate_if_goto($3.address, Lbody));
       code = join2(code, generate_goto(Lend));
       code = join2(code, generate_label(Lbody));
       code = join2(code, $5.code);
@@ -413,12 +413,12 @@ print_stmt
 print_list
   : print_list PUNCT_COMMA expr
     {
-      $$.code = join3($1.code, $3.code, generate_print($3.place));
+      $$.code = join3($1.code, $3.code, generate_print($3.address));
       $$.count = $1.count + 1;
     }
   | expr
     {
-      $$.code = join2($1.code, generate_print($1.place));
+      $$.code = join2($1.code, generate_print($1.address));
       $$.count = 1;
     }
   ;
@@ -456,79 +456,79 @@ expr
       }
 
       $$.tipo = $1.tipo;
-      $$.place = $1.name;
-      $$.code = join2($3.code, generate("=", $3.place, NULL, $1.name));
+      $$.address = $1.name;
+      $$.code = join2($3.code, generate("=", $3.address, NULL, $1.name));
     }
   | expr OR expr
     {
       $$.tipo = SYM_TYPE_INT;
-      $$.place = new_temp_name();
-      $$.code = join3($1.code, $3.code, generate("||", $1.place, $3.place, $$.place));
+      $$.address = new_temp_name();
+      $$.code = join3($1.code, $3.code, generate("||", $1.address, $3.address, $$.address));
     }
   | expr AND expr
     {
       $$.tipo = SYM_TYPE_INT;
-      $$.place = new_temp_name();
-      $$.code = join3($1.code, $3.code, generate("&&", $1.place, $3.place, $$.place));
+      $$.address = new_temp_name();
+      $$.code = join3($1.code, $3.code, generate("&&", $1.address, $3.address, $$.address));
     }
   | expr EQOP expr
     {
       $$.tipo = SYM_TYPE_INT;
-      $$.place = new_temp_name();
-      $$.code = join3($1.code, $3.code, generate(eqop_text($2), $1.place, $3.place, $$.place));
+      $$.address = new_temp_name();
+      $$.code = join3($1.code, $3.code, generate(eqop_text($2), $1.address, $3.address, $$.address));
     }
   | expr RELOP expr
     {
       $$.tipo = SYM_TYPE_INT;
-      $$.place = new_temp_name();
-      $$.code = join3($1.code, $3.code, generate(relop_text($2), $1.place, $3.place, $$.place));
+      $$.address = new_temp_name();
+      $$.code = join3($1.code, $3.code, generate(relop_text($2), $1.address, $3.address, $$.address));
     }
   | expr PLUS expr
     {
       $$.tipo = max($1.tipo, $3.tipo);
-      $$.place = new_temp_name();
-      $$.code = join3($1.code, $3.code, generate("+", $1.place, $3.place, $$.place));
+      $$.address = new_temp_name();
+      $$.code = join3($1.code, $3.code, generate("+", $1.address, $3.address, $$.address));
     }
   | expr MINUS expr
     {
       $$.tipo = max($1.tipo, $3.tipo);
-      $$.place = new_temp_name();
-      $$.code = join3($1.code, $3.code, generate("-", $1.place, $3.place, $$.place));
+      $$.address = new_temp_name();
+      $$.code = join3($1.code, $3.code, generate("-", $1.address, $3.address, $$.address));
     }
   | expr MULT expr
     {
       $$.tipo = max($1.tipo, $3.tipo);
-      $$.place = new_temp_name();
-      $$.code = join3($1.code, $3.code, generate("*", $1.place, $3.place, $$.place));
+      $$.address = new_temp_name();
+      $$.code = join3($1.code, $3.code, generate("*", $1.address, $3.address, $$.address));
     }
   | expr DIV expr
     {
       $$.tipo = max($1.tipo, $3.tipo);
-      $$.place = new_temp_name();
-      $$.code = join3($1.code, $3.code, generate("/", $1.place, $3.place, $$.place));
+      $$.address = new_temp_name();
+      $$.code = join3($1.code, $3.code, generate("/", $1.address, $3.address, $$.address));
     }
   | expr POW expr
     {
       $$.tipo = max($1.tipo, $3.tipo);
-      $$.place = new_temp_name();
-      $$.code = join3($1.code, $3.code, generate("**", $1.place, $3.place, $$.place));
+      $$.address = new_temp_name();
+      $$.code = join3($1.code, $3.code, generate("**", $1.address, $3.address, $$.address));
     }
   | MINUS expr %prec UMINUS
     {
       $$.tipo = $2.tipo;
-      $$.place = new_temp_name();
-      $$.code = join2($2.code, generate("-", $2.place, NULL, $$.place));
+      $$.address = new_temp_name();
+      $$.code = join2($2.code, generate("-", $2.address, NULL, $$.address));
     }
   | NOT expr %prec NOT
     {
       $$.tipo = SYM_TYPE_INT;
-      $$.place = new_temp_name();
-      $$.code = join2($2.code, generate("~", $2.place, NULL, $$.place));
+      $$.address = new_temp_name();
+      $$.code = join2($2.code, generate("~", $2.address, NULL, $$.address));
     }
   | primary_expr
     {
       $$.tipo = $1.tipo;
-      $$.place = $1.place;
+      $$.address = $1.address;
       $$.code = $1.code;
     }
   ;
@@ -537,25 +537,25 @@ primary_expr
   : use_var_id
     {
       $$.tipo = $1.tipo;
-      $$.place = $1.name;
+      $$.address = $1.name;
       $$.code = dup_text("");
     }
   | literal
     {
       $$.tipo = $1.tipo;
-      $$.place = $1.place;
+      $$.address = $1.address;
       $$.code = dup_text("");
     }
   | PUNCT_OPEN_PAREN expr PUNCT_CLOSE_PAREN
     {
       $$.tipo = $2.tipo;
-      $$.place = $2.place;
+      $$.address = $2.address;
       $$.code = $2.code;
     }
   | func_call
     {
       $$.tipo = $1.tipo;
-      $$.place = $1.place;
+      $$.address = $1.address;
       $$.code = $1.code;
     }
   ;
@@ -564,13 +564,13 @@ literal
   : INTEGER_LITERAL
     {
       $$.tipo = SYM_TYPE_INT;
-      $$.place = $1;
+      $$.address = $1;
       $$.code = dup_text("");
     }
   | FLOAT_LITERAL
     {
       $$.tipo = SYM_TYPE_FLOAT;
-      $$.place = $1;
+      $$.address = $1;
       $$.code = dup_text("");
     }
   ;
@@ -581,7 +581,7 @@ func_call
       char *temp_name = new_temp_name();
       char *call_line = generate_call_assign(temp_name, $1.name, $3.count);
       $$.tipo = $1.tipo;
-      $$.place = temp_name;
+      $$.address = temp_name;
       $$.code = join2($3.code, call_line);
     }
   ;
@@ -602,12 +602,12 @@ opt_func_call_list
 func_call_list
   : func_call_list PUNCT_COMMA expr
     {
-      $$.code = join3($1.code, $3.code, generate_param($3.place));
+      $$.code = join3($1.code, $3.code, generate_param($3.address));
       $$.count = $1.count + 1;
     }
   | expr
     {
-      $$.code = join2($1.code, generate_param($1.place));
+      $$.code = join2($1.code, generate_param($1.address));
       $$.count = 1;
     }
   ;
